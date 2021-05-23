@@ -10,5 +10,3 @@ async function start() {
 }
 
 start()
-
-//var test = "asdf";

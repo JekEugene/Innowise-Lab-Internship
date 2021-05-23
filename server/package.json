@@ -6,7 +6,8 @@
   "scripts": {
     "start": "npm run build && node dist/app.js",
     "dev": "npm run build && nodemon ./app.js",
-    "build": "tsc -p ."
+    "build": "tsc -p .",
+    "precommit": "lint-staged"
   },
   "repository": {
     "type": "git",
@@ -35,5 +36,12 @@
     "prettier": "^2.3.0",
     "ts-node": "^9.1.1",
     "typescript": "^4.2.4"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "node_modules/.bin/eslint --max-warnings=0 --fix",
+      "prettier --write",
+      "git add *"
+    ]
   }
 }
