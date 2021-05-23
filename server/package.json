@@ -5,7 +5,7 @@
   "main": "./dist/app.js",
   "scripts": {
     "start": "npm run build && node dist/app.js",
-    "dev": "npm run build && nodemon ./app.js",
+    "dev": "npm run build && nodemon ./app.ts",
     "build": "tsc -p .",
     "precommit": "lint-staged"
   },
@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/JekEugene/Innowise-Lab-Internship#readme",
   "dependencies": {
+    "dotenv": "^10.0.0",
     "express": "^4.17.1"
   },
   "devDependencies": {
