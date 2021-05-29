@@ -1,7 +1,8 @@
-import { Request, Response} from 'express'
+import { NextFunction, Request, Response} from 'express'
 
 export const authService = {
-	async userPage (req: Request, res: Response) :Promise<void> {
-		console.log(`hi`)
+	async authUser (req: Request, res: Response, next: NextFunction) :Promise<void> {
+		console.log()
 	}
+	
 }

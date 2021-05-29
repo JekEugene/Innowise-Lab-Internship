@@ -1,6 +1,7 @@
 import express from 'express'
 import { createConnection } from 'typeorm'
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
 
 import userController from './src/users/users.controller'
 import homeController from './src/home/home.controller'
@@ -11,6 +12,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 const app = express()
+
 
 app.use(`/`, homeController)
 app.use(`/user`, userController)
@@ -30,6 +32,7 @@ const options: cors.CorsOptions = {
 }
 
 app.use(cors(options))
+app.use(cookieParser())
 
 async function start() {
 	await createConnection()
