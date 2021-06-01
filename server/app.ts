@@ -11,8 +11,8 @@ import videoController from './src/videos/videos.controller'
 import dotenv from 'dotenv'
 dotenv.config()
 
+const PORT = process.env.PORT || 4000
 const app = express()
-
 
 app.use(`/`, homeController)
 app.use(`/user`, userController)
@@ -36,7 +36,7 @@ app.use(cookieParser())
 
 async function start() {
 	await createConnection()
-	app.listen(5000, () => {
+	app.listen(PORT, () => {
 		console.log(`server work`)
 	})
 }
