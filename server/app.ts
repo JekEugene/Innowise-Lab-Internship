@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser'
 
 import userController from './src/users/users.controller'
 import homeController from './src/home/home.controller'
-import authController from './src/auth/auth.controller'
+import authController from './src/auth/authentication.controller'
 import videoController from './src/videos/videos.controller'
 
 import dotenv from 'dotenv'

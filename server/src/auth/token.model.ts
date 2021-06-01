@@ -4,14 +4,15 @@ import {
 	Column,
 	BaseEntity,
 } from "typeorm"
+
 @Entity()
-export class User extends BaseEntity {
+export class Token extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number
 
 	@Column()
-	name: string
+	user_id: number
 
 	@Column()
-	password: string
+	token: string
 }
