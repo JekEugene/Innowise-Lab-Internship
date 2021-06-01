@@ -43,8 +43,8 @@ export const authService = {
 			const tokens = await tokenRep.find({ where: { user_id: user.id } })
 			const userToken = tokens.find(userToken => userToken.token === token ? true : false)
 			if (userToken) {
-				const accessToken = jwt.sign(user, process.env.ACCESS_SECRET_TOKEN, { expiresIn: `10s` })
-				const refreshToken = jwt.sign(user, process.env.REFRESH_SECRET_TOKEN, { expiresIn: `7d` })
+				const accessToken: string = jwt.sign(user, process.env.ACCESS_SECRET_TOKEN, { expiresIn: `10s` })
+				const refreshToken: string = jwt.sign(user, process.env.REFRESH_SECRET_TOKEN, { expiresIn: `7d` })
 				res.cookie(`accessToken`, accessToken, {maxAge: 1000 * 10, httpOnly: true})
 				res.cookie(`refreshToken`, refreshToken, { maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true })
 				res.locals.auth = true
