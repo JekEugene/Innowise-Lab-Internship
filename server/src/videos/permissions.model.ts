@@ -5,12 +5,12 @@ import {
 	BaseEntity,
 	ManyToOne,
 	JoinColumn,
-	OneToMany,
 } from "typeorm"
 import { User } from "../users/users.model"
-import { Permission } from "./permissions.model"
+import { Video } from "./videos.model"
+
 @Entity()
-export class Video extends BaseEntity {
+export class Permission extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number
 
@@ -18,18 +18,16 @@ export class Video extends BaseEntity {
 	user_id: number
 
 	@Column()
-	name: string
-
-	@Column()
-	type: string
+	video_id: number
 	
 	@Column()
-	link: string
+	type: string
 
 	@ManyToOne(()=>User, user => user.videos)
 	@JoinColumn({ name: `user_id` })
 	user: User
 
-	@OneToMany(() => Permission, permission => permission.video_id)
-	permissions: Permission[]
+	@ManyToOne(()=>Video, video => video.permissions)
+	@JoinColumn({ name: `video_id` })
+	video: Video
 }

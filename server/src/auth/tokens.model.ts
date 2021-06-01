@@ -3,7 +3,10 @@ import {
 	PrimaryGeneratedColumn,
 	Column,
 	BaseEntity,
+	ManyToOne,
+	JoinColumn,
 } from "typeorm"
+import { User } from "../users/users.model"
 
 @Entity()
 export class Token extends BaseEntity {
@@ -15,4 +18,8 @@ export class Token extends BaseEntity {
 
 	@Column()
 	token: string
+	
+	@ManyToOne(()=>User, user => user.tokens)
+	@JoinColumn({ name: `user_id` })
+	user: User
 }
