@@ -33,6 +33,7 @@ const options: cors.CorsOptions = {
 
 app.use(cors(options))
 app.use(cookieParser())
+app.use(express.json())
 
 async function start() {
 	await createConnection()

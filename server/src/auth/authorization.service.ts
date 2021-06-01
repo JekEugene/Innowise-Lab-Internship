@@ -2,13 +2,13 @@ import { NextFunction, Request, Response } from 'express'
 import * as jwt from 'jsonwebtoken'
 import { getRepository } from "typeorm"
 import { Token } from './tokens.model'
-import { UserPayload } from './user-payload.interface'
+import { IUserPayload } from './user-payload.interface'
 
 export const authService = {
 	async authUser(req: Request, res: Response, next: NextFunction): Promise<void> {
 		if (req.cookies?.accessToken) {
 			const token = req.cookies.accessToken
-			jwt.verify(token, process.env.ACCESS_SECRET_TOKEN, async (err: Error, user: UserPayload) => {
+			jwt.verify(token, process.env.ACCESS_SECRET_TOKEN, async (err: Error, user: IUserPayload) => {
 				if (err) {
 					console.log(err)
 					await this.refreshToken(req, res)
@@ -34,7 +34,7 @@ export const authService = {
 			return
 		}
 		const token = req.cookies.refreshToken
-		jwt.verify(token, process.env.REFRESH_SECRET_TOKEN, async (err: Error, user: UserPayload) => {
+		jwt.verify(token, process.env.REFRESH_SECRET_TOKEN, async (err: Error, user: IUserPayload) => {
 			if (err) {
 				res.locals.auth = false
 				return

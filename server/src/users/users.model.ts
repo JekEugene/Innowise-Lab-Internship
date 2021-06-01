@@ -17,7 +17,7 @@ export class User extends BaseEntity {
 	@Column()
 	name: string
 
-	@Column()
+  @Column()
 	password: string
 
 	@OneToMany(() => Video, video => video.user_id)

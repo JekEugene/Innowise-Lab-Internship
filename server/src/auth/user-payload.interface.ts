@@ -1,4 +1,4 @@
-export interface UserPayload {
+export interface IUserPayload {
   id: number
   name: string
 }
