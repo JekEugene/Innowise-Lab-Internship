@@ -1,18 +1,18 @@
-import { Request, Response } from 'express'
 import * as bcrypt from 'bcrypt'
 import * as jwt from 'jsonwebtoken'
 
 import { ICreateUserDto } from '../users/dto/create-user.dto'
 import { User } from '../users/users.model'
+import { ITokens } from './tokens.interface'
 import { Token } from './tokens.model'
 import { IUserPayload } from './user-payload.interface'
 
 export const authenticationService = {
-	async register(req: Request, res: Response): Promise<unknown> {
-		const { login, password } = req.body
-		const user = await User.findOne({ where: { login } })
+	async register(createUserDto: ICreateUserDto): Promise<boolean | ICreateUserDto> {
+		const { login, password } = createUserDto
+		const user = await User.findOne({ where: { login: createUserDto.login } })
 		if (user) {
-			return res.status(422).send(`user already exist`)
+			return false
 		}
 
 		const hashPassword = await bcrypt.hash(password, 10)
@@ -22,12 +22,11 @@ export const authenticationService = {
 		}
 		await User.create(newUser).save()
 
-		return res.status(201).send(`user created`)
+		return newUser
 	},
 
-	async login(req: Request, res: Response): Promise<unknown> {
+	async login(login: string, password: string): Promise<ITokens | boolean> {
 		try {
-			const { login, password } = req.body
 			const candidate = await User.findOne({ login })
 			if (candidate) {
 				const arePasswordsSame = await bcrypt.compare(
@@ -52,22 +51,18 @@ export const authenticationService = {
 						process.env.REFRESH_SECRET_TOKEN,
 						{ expiresIn: `7d` }
 					)
-					res.cookie(`accessToken`, accessToken, {
-						maxAge: 1000 * 15,
-						httpOnly: true,
-					})
-					res.cookie(`refreshToken`, refreshToken, {
-						maxAge: 1000 * 60 * 60 * 24 * 7,
-						httpOnly: true,
-					})
 					Token.create({ token: refreshToken, user_id: user.id })
 
-					res.status(200)
+					const tokens: ITokens = {
+						accessToken,
+						refreshToken
+					}
+					return tokens
 				} else {
-					return res.status(401)
+					return false
 				}
 			} else {
-				return res.status(401)
+				return false
 			}
 		} catch (e) {
 			console.log(e)
