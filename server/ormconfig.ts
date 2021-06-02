@@ -7,4 +7,7 @@ export default {
 	database: process.env.DB_NAME || `videogallery1`,
 	logging: process.env.DB_LOGGING || false,
 	synchronize: process.env.DB_SYNC || true,
+	entities: [
+		`./src/**/*.model.ts`
+	]
 }

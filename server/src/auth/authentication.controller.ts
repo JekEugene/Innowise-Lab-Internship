@@ -7,6 +7,7 @@ import { authenticationService } from './authentication.service'
 import { ITokens } from "./tokens.interface"
 
 authController.post(`/register`, async (req: Request, res: Response) => {
+	console.log(req.body)
 	const { login, password } = req.body
 	const user = await authenticationService.findUser(login)
 	if (user) {

@@ -3,6 +3,9 @@ import { createConnection } from 'typeorm'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 
+const app = express()
+app.use(express.json())
+
 import userController from './src/users/users.controller'
 import homeController from './src/home/home.controller'
 import authController from './src/auth/authentication.controller'
@@ -12,7 +15,6 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 const PORT = process.env.PORT || 4000
-const app = express()
 
 app.use(`/`, homeController)
 app.use(`/user`, userController)
@@ -33,7 +35,7 @@ const options: cors.CorsOptions = {
 
 app.use(cors(options))
 app.use(cookieParser())
-app.use(express.json())
+
 
 async function start() {
 	await createConnection()
