@@ -14,16 +14,16 @@ export class Video extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number
 
-	@Column()
+	@Column(`int`)
 	user_id: number
 
-	@Column()
+	@Column(`varchar`)
 	name: string
 
-	@Column()
+	@Column(`varchar`)
 	type: string
 	
-	@Column()
+	@Column(`varchar`)
 	link: string
 
 	@ManyToOne(()=>User, user => user.videos)

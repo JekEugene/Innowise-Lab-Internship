@@ -14,10 +14,10 @@ export class User extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number
 
-	@Column()
+	@Column(`varchar`)
 	login: string
 
-  @Column()
+  @Column(`varchar`)
 	password: string
 
 	@OneToMany(() => Video, video => video.user_id)

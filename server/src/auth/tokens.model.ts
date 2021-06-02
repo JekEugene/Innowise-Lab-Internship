@@ -13,10 +13,10 @@ export class Token extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number
 
-	@Column()
+  @Column(`int`)
 	user_id: number
 
-	@Column()
+	@Column(`varchar`)
 	token: string
 	
 	@ManyToOne(()=>User, user => user.tokens)

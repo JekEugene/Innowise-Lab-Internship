@@ -14,13 +14,13 @@ export class Permission extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number
 
-	@Column()
+	@Column(`int`)
 	user_id: number
 
-	@Column()
+	@Column(`int`)
 	video_id: number
 	
-	@Column()
+	@Column(`varchar`)
 	type: string
 
 	@ManyToOne(()=>User, user => user.videos)
