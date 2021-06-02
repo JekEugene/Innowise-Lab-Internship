@@ -8,24 +8,37 @@ import { Token } from './tokens.model'
 import { IUserPayload } from './user-payload.interface'
 
 export const authenticationService = {
-	async register(createUserDto: ICreateUserDto): Promise<boolean | ICreateUserDto> {
-		const { login, password } = createUserDto
-		const user = await User.findOne({ where: { login: createUserDto.login } })
-		if (user) {
-			return false
-		}
+	// async register(createUserDto: ICreateUserDto): Promise<unknown> {
+	// 	const { login, password } = createUserDto
+	// 	const user = await User.findOne({ where: { login: createUserDto.login } })
+	// 	if (user) {
+	// 		return false
+	// 	}
 
-		const hashPassword = await bcrypt.hash(password, 10)
-		const newUser: ICreateUserDto = {
-			login,
-			password: hashPassword,
-		}
-		await User.create(newUser).save()
+	// 	const hashPassword = await bcrypt.hash(password, 10)
+	// 	const newUser: ICreateUserDto = {
+	// 		login,
+	// 		password: hashPassword,
+	// 	}
+	// 	await User.create(newUser).save()
 
-		return newUser
+	// 	return newUser
+	// },
+
+	async findUser(login: string): Promise<User> {
+		return await User.findOne({ where: { login } })
 	},
 
-	async login(login: string, password: string): Promise<ITokens | boolean> {
+	async hashPassword(password: string): Promise<string> {
+		return await bcrypt.hash(password, 10)
+	},
+
+	async createUser(user: ICreateUserDto): Promise<User> {
+		return await User.create(user).save()
+	},
+
+
+	async login(login: string, password: string): Promise<unknown> {
 		try {
 			const candidate = await User.findOne({ login })
 			if (candidate) {
