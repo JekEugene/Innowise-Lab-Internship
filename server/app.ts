@@ -16,26 +16,14 @@ dotenv.config()
 
 const PORT = process.env.PORT || 4000
 
+app.use(cors())
+
 app.use(`/`, homeController)
 app.use(`/user`, userController)
 app.use(`/auth`, authController)
 app.use(`/video`, videoController)
 
-const options: cors.CorsOptions = {
-	allowedHeaders: [
-		`Origin`,
-		`X-Requested-With`,
-		`Content-Type`,
-		`Accept`,
-	],
-	credentials: true,
-	methods: `GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE`,
-	preflightContinue: false,
-}
-
-app.use(cors(options))
 app.use(cookieParser())
-
 
 async function start() {
 	await createConnection()
