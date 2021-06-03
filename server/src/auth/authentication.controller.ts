@@ -24,11 +24,11 @@ authController.post(`/login`, async (req: Request, res: Response) => {
 	const { login, password } = req.body
 	const user = await authenticationService.findUser(login)
 	if (!user) {
-		res.status(401).send(`user does not exist`)
+		return res.status(401).send(`user does not exist`)
 	}
 	const arePasswordsSame: boolean = await authenticationService.comparePasswords(user, password)
 	if (!arePasswordsSame) {
-		res.status(401).send(`wrong password`)
+		return res.status(401).send(`wrong password`)
 	}
 
 	const userPayload: IUserPayload = {
@@ -50,7 +50,7 @@ authController.post(`/login`, async (req: Request, res: Response) => {
 	})
 	res.cookie(`id`, user.id)
 	res.cookie(`login`, user.login)
-	res.status(200).send(`logged in`)
+	return res.status(200).send(`logged in`)
 })
 
 export = authController

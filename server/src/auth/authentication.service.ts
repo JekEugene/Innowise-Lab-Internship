@@ -22,8 +22,8 @@ export const authenticationService = {
 	
 	async comparePasswords(user: User, password: string): Promise<boolean> {
 		return await bcrypt.compare(
+			password,
 			user.password,
-			password
 		)
 	},
 
