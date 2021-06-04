@@ -49,6 +49,7 @@ export const authService = {
 				res.cookie(`refreshToken`, refreshToken, { maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true })
 				res.locals.auth = true
 				res.locals.user = user
+				res.locals.refreshToken = refreshToken
 				return
 			} else {
 				res.locals.auth = false

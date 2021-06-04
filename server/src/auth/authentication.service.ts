@@ -45,4 +45,9 @@ export const authenticationService = {
 			{ expiresIn: `15d` }
 		)
 	},
+	
+	deleteToken(token: string, userId: number): Promise<void> {
+		Token.delete({ user_id: userId, token })
+		return
+	}
 }

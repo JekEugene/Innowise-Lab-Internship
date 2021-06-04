@@ -3,6 +3,7 @@ import { ICreateUserDto } from "../users/dto/create-user.dto"
 import { IUserPayload } from "./user-payload.interface"
 const authController = Router()
 import { authenticationService } from './authentication.service'
+import { authService } from "./authorization.service"
 
 authController.post(`/register`, async (req: Request, res: Response) => {
 	const { login, password } = req.body
@@ -16,8 +17,7 @@ authController.post(`/register`, async (req: Request, res: Response) => {
 		password: hashPassword
 	}
 	authenticationService.createUser(newUser)
-	return res.status(201).send(`user created`)
-	
+	return res.redirect(201, `/login`)
 })
 
 authController.post(`/login`, async (req: Request, res: Response) => {
@@ -43,14 +43,28 @@ authController.post(`/login`, async (req: Request, res: Response) => {
 	res.cookie(`accessToken`, accessToken, {
 		maxAge: 1000 * 15,
 		httpOnly: true,
+		path: `/`,
 	})
 	res.cookie(`refreshToken`, refreshToken, {
 		maxAge: 1000 * 60 * 60 * 24 * 7,
 		httpOnly: true,
+		path: `/`,
 	})
-	res.cookie(`id`, user.id)
-	res.cookie(`login`, user.login)
-	return res.status(200).send(`logged in`)
+	res.cookie(`id`, user.id, {path: `/`})
+	res.cookie(`login`, user.login, {path: `/`})
+	return res.redirect(200, `/`)
+})
+
+authController.get(`/logout`, authService.authUser, async (req: Request, res: Response) => {
+	if (!res.locals.auth) {
+		return res.status(401).send(`you are not logged in`)
+	}
+	authenticationService.deleteToken(res.locals.refreshToken, res.locals.user.id)
+	res.clearCookie(`accessToken`)
+		.clearCookie(`refreshToken`)
+		.clearCookie(`id`)
+		.clearCookie(`login`)
+	return res.redirect(200, `/`)
 })
 
 export = authController

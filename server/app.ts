@@ -16,7 +16,15 @@ dotenv.config()
 
 const PORT = process.env.PORT || 4000
 
-app.use(cors())
+const corsOptions = {
+	origin: `http://localhost:8080`,
+	methods: [`GET`, `PUT`, `POST`, `DELETE`, `OPTIONS`],
+	optionsSuccessStatus: 204,
+	credentials: true,
+	allowedHeaders: [`Content-Type`, `Authorization`, `X-Requested-With`, `device-remember-token`, `Access-Control-Allow-Origin`, `Origin`, `Accept`]
+}
+
+app.use(cors(corsOptions))
 
 app.use(`/`, homeController)
 app.use(`/user`, userController)
