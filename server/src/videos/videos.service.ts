@@ -1,3 +1,4 @@
+import { ICreatePermissionDto } from './dto/create-permission.dto'
 import { ICreateVideoDto } from './dto/create-video.dto'
 import { IUpdateVideoDto } from './dto/update-video.dto'
 import { Permission } from './permissions.model'
@@ -25,4 +26,12 @@ export const videoService = {
 		const permission: Permission[] = await Permission.find({ where: {video_id: videoId}})
 		return permission
 	},
+	
+	async createPermission(createPermission: ICreatePermissionDto): Promise<void> {
+		Permission.create(createPermission)
+	},
+
+	async deletePermission(id: number): Promise<void> {
+		Permission.delete(id)
+	}
 }

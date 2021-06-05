@@ -272,12 +272,14 @@ class VideoSettings extends AbstractView {
 						<button type="submit">update</button>
 					</form>
 					<h3>give permission</h3>
-					<form class="newpermission" onsubmit="newPermission(); return false">
-					<input class="id" type="number" name="id" placeholder="user id">
+					<form class="createpermission" onsubmit="createpermission(); return false">
+					<input class="user_id" type="number" name="user_id" placeholder="user id">
+					<input class="video_id" type="number" name="video_id" placeholder="video id">
 					<select class="type" name="type">
 						<option value = "WATCH" >WATCH</option>
 						<option value = "ADMIN" >ADMIN</option>
 					</select>
+					</form>
 					<h3>delete permission</h3>
 			` + permissions.join('');
 	}

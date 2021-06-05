@@ -110,8 +110,14 @@
 			}
 			
 			async function createPermission() {
+				const form = document.querySelector('.createpermission')
+				const permission = {
+					user_id: form.user_id.value,
+					video_id: form.video_id.value,
+					type: form.type.value
+				};
 				const response = await fetch(`http://localhost:4000/videos/createpermission`, {
-					method: `DELETE`,
+					method: `POST`,
 					headers: {
 						'Content-Type': 'application/json;charset=utf-8',
 					},

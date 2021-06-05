@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express"
 import { authService } from "../auth/authorization.service"
+import { ICreatePermissionDto } from "./dto/create-permission.dto"
 import { ICreateVideoDto } from "./dto/create-video.dto"
 import { IUpdateVideoDto } from "./dto/update-video.dto"
 import { Permission } from "./permissions.model"
@@ -54,5 +55,21 @@ videoController.patch(`/updatevideo`, authService.authUser, async (req: Request,
 	return res.status(200).send(`video updated`)
 })
 
+videoController.post(`/createpermission`, authService.authUser, async (req: Request, res: Response) => {
+	if (!res.locals.auth) {
+		return res.status(401).send(`you are not logged in`)
+	}
+	const newPermission: ICreatePermissionDto = req.body
+	videoService.createPermission(newPermission)
+	return res.status(200).send(`permission created`)
+})
+
+videoController.delete(`/deletepermission`, authService.authUser, async (req: Request, res: Response) => {
+	if (!res.locals.auth) {
+		return res.status(401).send(`you are not logged in`)
+	}
+	videoService.deletePermission(req.body.id)
+	return res.status(200).send(`permission deleted`)
+})
 
 export = videoController
