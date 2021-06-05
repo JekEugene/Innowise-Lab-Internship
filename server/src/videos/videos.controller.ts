@@ -60,6 +60,10 @@ videoController.post(`/createpermission`, authService.authUser, async (req: Requ
 		return res.status(401).send(`you are not logged in`)
 	}
 	const newPermission: ICreatePermissionDto = req.body
+	const validate: boolean = await videoService.validateCreatePermission(res.locals.id, newPermission)
+	if (!validate) {
+		return res.status(401).send(`validate error`)
+	}
 	videoService.createPermission(newPermission)
 	return res.status(200).send(`permission created`)
 })
@@ -67,6 +71,10 @@ videoController.post(`/createpermission`, authService.authUser, async (req: Requ
 videoController.delete(`/deletepermission`, authService.authUser, async (req: Request, res: Response) => {
 	if (!res.locals.auth) {
 		return res.status(401).send(`you are not logged in`)
+	}
+	const validate: boolean = await videoService.validateDeletePermission(res.locals.user.id, req.body.id)
+	if (!validate) {
+		return res.status(401).send(`validate error`)
 	}
 	videoService.deletePermission(req.body.id)
 	return res.status(200).send(`permission deleted`)
