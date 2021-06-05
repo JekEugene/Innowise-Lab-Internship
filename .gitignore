@@ -3,5 +3,6 @@ test2
 server/node_modules
 server/.env
 server/dist
+server/videos
 client/node_modules
 client/static/videos

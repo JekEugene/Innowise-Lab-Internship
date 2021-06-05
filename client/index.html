@@ -14,6 +14,11 @@
 				width: 400px;
 				height: 280px;
 			}
+			.userblock {
+				float: left;
+				margin: 20px;
+				border: solid 1px black;
+			}
 		</style>
 	</head>
 	<body>
@@ -61,6 +66,16 @@
 					window.location.href = res.slice(res.lastIndexOf('/'))
 				}
 				return false;
+			}
+			async function upload() {
+				const file = document.querySelector('.uploadvideo')
+				let fd = new FormData()
+				fd.append('filedata',file.files[0])
+				const response = await fetch(`http://localhost:4000/videos/newvideo`, {
+					method: `POST`,
+					credentials: 'include',
+					body: fd,
+				});
 			}
 		</script>
 	</body>

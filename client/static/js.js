@@ -28,7 +28,7 @@ class Home extends AbstractView {
 		const res = result.map((el)=>{
 			return `
 				<div class="videoblock">
-					<video class="video" src="/static/videos/${el.link}.mp4" controls></video>
+					<video class="video" src="/static/videos/${el.link}.mp4" poster></video>
 					<p>video name: ${el.name}</p>
 					<p>user: ${el.user_id}</p>
 				</div>
@@ -87,15 +87,13 @@ class AllUsers extends AbstractView {
 
 		let response = await fetch(`http://localhost:4000/users`, {
 			method: `get`,
-			credentials: 'include',
 		})
 		const result = await response.json()
 		const res = result.map((el)=>{
 			return `
-				<div class="videoblock">
-					<video class="video" src="/static/videos/${el.link}.mp4" controls></video>
-					<p>video name: ${el.name}</p>
-					<p>user: ${el.user_id}</p>
+				<div class="userblock">
+					<p>user name: <a href="/users/${el.id}">${el.name}</a></p>
+					<p>user id: ${el.id}</p>
 				</div>
 			`
 		})
@@ -128,19 +126,20 @@ class Users extends AbstractView {
 						<a href="/videos/${el.link}"><video class="video" src="/static/videos/${el.link}.mp4" poster></video></a>
 						<p>video name: ${el.name}</p>
 						<p>user: <a href="/users/${el.user_id}">${el.user_id}</a></p>
+						<a href="/settings/${el.link}">settings</a>
 					</div>
 				`
 			})
 
-			return `
+			return `<div style="margin: 50px"><a href="/videos/newvideo">upload new video</a></div>
 					<h1>Ваши видео:</h1>
-			` + res.join('');
+			` + res.join('')
 		} else {
 
 			const res = result.map((el)=>{
 				return `
 					<div class="videoblock">
-						<video class="video" src="/static/videos/${el.link}.mp4" poster></video>
+						<a href="/videos/${el.link}"><video class="video" src="/static/videos/${el.link}.mp4" poster></video></a>
 						<p>video name: ${el.name}</p>
 						<p>user: ${el.user_id}</p>
 					</div>
@@ -164,6 +163,28 @@ class Videos extends AbstractView {
 	async getHtml() {
 		return `
 					<h1>Video</h1>
+			`;
+	}
+}
+
+
+class NewVideo extends AbstractView {
+	constructor(params) {
+		super(params);
+		this.setTitle('new video');
+	}
+
+	async getHtml() {
+
+		if(!getCookie('id')){
+			navigateTo(`/login`)
+		}
+		
+		return `
+				<form onsubmit="upload(); return false">
+					<input class="uploadvideo" type="file" name="filedata">
+					<button type="submit">upload</button>
+				</form>
 			`;
 	}
 }
@@ -221,9 +242,9 @@ const router = async () => {
 		{ path: '/', view: Home },
 		{ path: '/users', view: AllUsers },
 		{ path: '/users/:id', view: Users },
-		{ path: '/users/newvideo', view: Users },
+		{ path: '/videos/newvideo', view: NewVideo },
 		{ path: '/videos/:id', view: Videos },
-		{ path: '/videos/:id/settings', view: VideoSettings },
+		{ path: '/settings/:id', view: VideoSettings },
 		{ path: '/register', view: Register },
 		{ path: '/login', view: Login },
 		{ path: '/logout', view: Logout },
