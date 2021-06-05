@@ -42,7 +42,7 @@ export const videoService = {
 			return false
 		}
 		return true
-	}
+	},
 
 	async deletePermission(id: number): Promise<void> {
 		Permission.delete(id)
