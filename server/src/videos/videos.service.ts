@@ -28,7 +28,7 @@ export const videoService = {
 	},
 	
 	async createPermission(createPermission: ICreatePermissionDto): Promise<void> {
-		Permission.create(createPermission)
+		Permission.create(createPermission).save()
 	},
 
 	async deletePermission(id: number): Promise<void> {

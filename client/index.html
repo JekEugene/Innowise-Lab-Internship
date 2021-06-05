@@ -109,7 +109,7 @@
 				}
 			}
 			
-			async function createPermission() {
+			async function createpermission() {
 				const form = document.querySelector('.createpermission')
 				const permission = {
 					user_id: form.user_id.value,
@@ -122,12 +122,12 @@
 						'Content-Type': 'application/json;charset=utf-8',
 					},
 					credentials: 'include',
-					body: JSON.stringify({id})
+					body: JSON.stringify(permission)
 				});
 				if(response.ok){
-					alert(`permission deleted`)
+					alert(`permission created`)
 				} else {
-					alert(`error: permission has not been deleted`)
+					alert(`error: permission has not been created`)
 				}
 			}
 			async function deletePermission(id) {

@@ -248,11 +248,11 @@ class VideoSettings extends AbstractView {
 		
 		permissions = permissions.map(perm=>{
 			return `
-				<div style="border: solid 1px black; margin 20px">
+				<div style="border: solid 1px black; margin: 20px; float: left;">
 					<p>user id: ${perm.user_id}</p>
 					<p>video id: ${perm.video_id}</p>
 					<p>type: ${perm.type}</p>
-					<buttom onclick="deletePermission(${perm.id})">delete permission</buttom>
+					<button onclick="deletePermission(${perm.id})">delete permission</button>
 				</div>
 			`
 		})
@@ -261,24 +261,27 @@ class VideoSettings extends AbstractView {
 		return `
 						<h3>update video:</h3>
 						<form class="videoupdate" onsubmit="update(); return false">
-						<input class="name" type="text" name="name" placeholder="file name" value="${video.name}">
+						<input required class="name" type="text" name="name" placeholder="file name" value="${video.name}">
 						<select class="type" name="type">
 							<option value = "READ_ALL" ${video.type === "READ_ALL" ? 'selected' : ''}>READ_ALL</option>
 							<option value = "READ_AUTH" ${video.type === "READ_AUTH" ? 'selected' : ''}>READ_AUTH</option>
 							<option value = "READ_CHOSEN" ${video.type === "READ_CHOSEN" ? 'selected' : ''}>READ_CHOSEN</option>
 							<option value = "READ_ADMIN" ${video.type === "READ_ADMIN" ? 'selected' : ''}>READ_ADMIN</option>
 						</select>
-						<input class="id" type="hidden" name="id" hidden value="${video.id}">
+						<input class="id" type="hidden" name="id" value="${video.id}">
 						<button type="submit">update</button>
 					</form>
 					<h3>give permission</h3>
 					<form class="createpermission" onsubmit="createpermission(); return false">
-					<input class="user_id" type="number" name="user_id" placeholder="user id">
-					<input class="video_id" type="number" name="video_id" placeholder="video id">
+					<input required class="user_id" type="number" name="user_id" placeholder="user id">
+					<input class="video_id" type="hidden" name="video_id" value=${location.href.slice(
+						location.href.lastIndexOf('/')+1
+					)}>
 					<select class="type" name="type">
 						<option value = "WATCH" >WATCH</option>
 						<option value = "ADMIN" >ADMIN</option>
 					</select>
+					<button type="submit">create permission</button>
 					</form>
 					<h3>delete permission</h3>
 			` + permissions.join('');
