@@ -23,8 +23,4 @@ userController.get(`/:id`, authService.authUser, async (req: Request, res: Respo
 	res.status(200).json(sendVideos)
 })
 
-userController.post(`/newvideo`, async (req: Request, res: Response) => {
-	
-})
-
 export = userController

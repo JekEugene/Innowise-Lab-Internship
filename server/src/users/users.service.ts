@@ -20,7 +20,6 @@ export const userService = {
 					permission.video_id = video.id and permission.type = 'ADMIN'`, { userId })
 					.orWhere(`video.type = 'READ_ADMIN' and video.user_id = :userId`, { userId })
 			}))
-			.printSql()
 			.getMany()
 	}
 }

@@ -1,7 +1,9 @@
-import express from 'express'
+import express, { Request, Response} from 'express'
 import { createConnection } from 'typeorm'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
+import multer from 'multer'
+import path from 'path'
 
 const app = express()
 app.use(express.json())
@@ -26,6 +28,37 @@ const corsOptions = {
 
 app.use(cors(corsOptions))
 app.use(cookieParser())
+
+const storageConfig = multer.diskStorage({
+	destination: (req, file, cb) =>{
+		cb(null, `videos`)
+	},
+	filename: (req, file, cb) =>{
+		cb(null, file.originalname)
+	}
+})
+
+const fileFilter = (req, file, cb) => {
+	console.log(`filter`)
+	if(file.mimetype === `video/mp4`){
+		cb(null, true)
+	}
+	else{
+		cb(null, false)
+	}
+}
+
+app.use(express.static(__dirname))
+
+app.use(multer({storage:storageConfig, fileFilter: fileFilter}).single(`filedata`))
+app.post(`/videos/newvideo`, async (req: Request, res: Response) => {
+	console.log(`here`)
+	const filedata = req.file
+	console.log(req.file)
+	if(!filedata)
+		return res.status(400).send(`Ошибка при загрузке файла`)
+	return res.status(200).send(`файл загружен`)
+})
 
 app.use(`/`, homeController)
 app.use(`/users`, userController)
