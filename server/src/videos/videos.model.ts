@@ -30,6 +30,6 @@ export class Video extends BaseEntity {
 	@JoinColumn({ name: `user_id` })
 	user: User
 
-	@OneToMany(() => Permission, permission => permission.video_id)
+	@OneToMany(() => Permission, permission => permission.video)
 	permissions: Permission[]
 }

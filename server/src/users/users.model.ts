@@ -20,12 +20,12 @@ export class User extends BaseEntity {
   @Column(`varchar`)
 	password: string
 
-	@OneToMany(() => Video, video => video.user_id)
+	@OneToMany(() => Video, video => video.user)
 	videos: Video[]
 
-	@OneToMany(() => Token, token => token.user_id)
+	@OneToMany(() => Token, token => token.user)
 	tokens: Token[]
 
-	@OneToMany(() => Permission, permission => permission.user_id)
+	@OneToMany(() => Permission, permission => permission.user)
 	permissions: Permission[]
 }
