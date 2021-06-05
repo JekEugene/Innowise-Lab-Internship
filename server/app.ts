@@ -28,9 +28,9 @@ app.use(cors(corsOptions))
 app.use(cookieParser())
 
 app.use(`/`, homeController)
-app.use(`/user`, userController)
+app.use(`/users`, userController)
 app.use(`/auth`, authController)
-app.use(`/video`, videoController)
+app.use(`/videos`, videoController)
 
 
 async function start() {
