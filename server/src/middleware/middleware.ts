@@ -2,6 +2,7 @@ import { Express, Request } from "express"
 import multer from "multer"
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
+import path from "path"
 
 export function middleware(app: Express, express): void {
 	app.use(express.json())
@@ -22,13 +23,15 @@ export function middleware(app: Express, express): void {
 			cb(null, `videos`)
 		},
 		filename: (req: Request, file: Express.Multer.File, cb) => {
-			cb(null, file.originalname)
+			req.body.link = `VIDEO-` + Date.now() + path.extname(file.originalname)
+			cb(null, req.body.link)
 		}
 	})
 	
 	const fileFilter = (req: Request, file: Express.Multer.File, cb) => {
-		console.log(`filter`)
-		if(file.mimetype === `video/mp4`){
+		const videoTypes = [`video/mpeg`, `video/mp4`, `video/ogg`, `video/quicktime`,
+			`video/webm`, `video/x-ms-wmv`, `video/x-flv`, `video/x-msvideo`, `video/3gpp`, `video/3gpp2`]
+		if(videoTypes.includes(file.mimetype)){
 			cb(null, true)
 		}
 		else{

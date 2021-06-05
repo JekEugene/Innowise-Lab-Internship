@@ -1,7 +1,8 @@
-import { Request, Response} from 'express'
+import { ICreateVideoDto } from './dto/create-video.dto'
+import { Video } from './videos.model'
 
 export const videoService = {
-	async userPage (req: Request, res: Response) :Promise<void> {
-		console.log(`hi`)
+	async createVideo(newVideo: ICreateVideoDto): Promise<void> {
+		Video.create(newVideo).save()
 	}
 }

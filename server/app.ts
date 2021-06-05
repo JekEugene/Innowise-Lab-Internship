@@ -2,7 +2,6 @@ import express from 'express'
 import { createConnection } from 'typeorm'
 import { middleware } from './src/middleware/middleware'
 
-console.log(express)
 const app = express()
 
 import userController from './src/users/users.controller'

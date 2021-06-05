@@ -35,7 +35,7 @@ class Home extends AbstractView {
 			`
 		})
 
-		return res.join();
+		return res.join('');
 	}
 }
 
@@ -181,8 +181,15 @@ class NewVideo extends AbstractView {
 		}
 		
 		return `
-				<form onsubmit="upload(); return false">
+				<form class="newvideo" onsubmit="upload(); return false">
 					<input class="uploadvideo" type="file" name="filedata">
+					<input class="name" type="text" name="name" placeholder="file name">
+					<select class="type" name="type">
+						<option value = "READ_ALL">READ_ALL</option>
+						<option value = "READ_AUTH">READ_AUTH</option>
+						<option value = "READ_CHOSEN">READ_CHOSEN</option>
+						<option value = "READ_ADMIN">READ_ADMIN</option>
+					</select>
 					<button type="submit">upload</button>
 				</form>
 			`;
