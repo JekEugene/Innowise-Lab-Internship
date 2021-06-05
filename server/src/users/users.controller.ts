@@ -18,7 +18,7 @@ userController.get(`/`, async (req: Request, res: Response) => {
 userController.get(`/:id`, authService.authUser, async (req: Request, res: Response) => {
 	const videos: Video[] = await userService.getUserVideos(res.locals.auth, res.locals.user?.id, +req.params.id)
 	const sendVideos = videos.map(video => {
-		return { name: video.name, link: video.link, user_id: video.user_id }
+		return { id: video.id, name: video.name, link: video.link, user_id: video.user_id }
 	})
 	res.status(200).json(sendVideos)
 })

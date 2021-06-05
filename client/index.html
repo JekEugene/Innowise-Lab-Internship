@@ -85,6 +85,60 @@
 					alert(`error: video does not uploads`)
 				}
 			}
+			async function update(){
+				const form = document.querySelector('.videoupdate')
+				let fd = new FormData()
+				const updateVideo = {
+					id: form.id.value,
+					name: form.name.value,
+					type: form.type.value
+				}
+				const response = await fetch(`http://localhost:4000/videos/updatevideo`, {
+					method: `PATCH`,
+					headers: {
+						'Content-Type': 'application/json;charset=utf-8',
+					},
+					credentials: 'include',
+					body: JSON.stringify(updateVideo)
+				});
+				console.log(response)
+				if(response.ok){
+					alert(`video updated`)
+				} else {
+					alert(`error: video has not been updated`)
+				}
+			}
+			
+			async function createPermission() {
+				const response = await fetch(`http://localhost:4000/videos/createpermission`, {
+					method: `DELETE`,
+					headers: {
+						'Content-Type': 'application/json;charset=utf-8',
+					},
+					credentials: 'include',
+					body: JSON.stringify({id})
+				});
+				if(response.ok){
+					alert(`permission deleted`)
+				} else {
+					alert(`error: permission has not been deleted`)
+				}
+			}
+			async function deletePermission(id) {
+				const response = await fetch(`http://localhost:4000/videos/deletepermission`, {
+					method: `DELETE`,
+					headers: {
+						'Content-Type': 'application/json;charset=utf-8',
+					},
+					credentials: 'include',
+					body: JSON.stringify({id})
+				});
+				if(response.ok){
+					alert(`permission deleted`)
+				} else {
+					alert(`error: permission has not been deleted`)
+				}
+			}
 		</script>
 	</body>
 </html>

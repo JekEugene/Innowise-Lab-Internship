@@ -19,21 +19,20 @@ class Home extends AbstractView {
 	}
 
 	async getHtml() {
-		
 		let response = await fetch(`http://localhost:4000/`, {
 			method: `get`,
 			credentials: 'include',
-		})
-		const result = await response.json()
-		const res = result.map((el)=>{
+		});
+		const result = await response.json();
+		const res = result.map((el) => {
 			return `
 				<div class="videoblock">
-					<video class="video" src="/static/videos/${el.link}.mp4" poster></video>
+				<a href="/videos/${el.id}"><video class="video" src="/static/videos/${el.link}" poster></video></a>
 					<p>video name: ${el.name}</p>
-					<p>user: ${el.user_id}</p>
+					<p>user: <a href="/users/${el.user_id}">${el.user_id}</a></p>
 				</div>
-			`
-		})
+			`;
+		});
 
 		return res.join('');
 	}
@@ -84,19 +83,18 @@ class AllUsers extends AbstractView {
 	}
 
 	async getHtml() {
-
 		let response = await fetch(`http://localhost:4000/users`, {
 			method: `get`,
-		})
-		const result = await response.json()
-		const res = result.map((el)=>{
+		});
+		const result = await response.json();
+		const res = result.map((el) => {
 			return `
 				<div class="userblock">
 					<p>user name: <a href="/users/${el.id}">${el.name}</a></p>
 					<p>user id: ${el.id}</p>
 				</div>
-			`
-		})
+			`;
+		});
 
 		return `
 					<h1>Ваши видео:</h1>
@@ -104,53 +102,61 @@ class AllUsers extends AbstractView {
 	}
 }
 
-
 class Users extends AbstractView {
 	constructor(params) {
 		super(params);
-		this.setTitle(getCookie("login"));
+		this.setTitle(getCookie('login'));
 	}
 
 	async getHtml() {
-		let response = await fetch(`http://localhost:4000/users${location.href.slice(location.href.lastIndexOf('/'))}`, {
-			method: `get`,
-			credentials: 'include',
-		})
-		const result = await response.json()
+		let response = await fetch(
+			`http://localhost:4000/users${location.href.slice(
+				location.href.lastIndexOf('/')
+			)}`,
+			{
+				method: `get`,
+				credentials: 'include',
+			}
+		);
+		const result = await response.json();
 
-		if(location.href.slice(location.href.lastIndexOf('/')+1) === getCookie('id')){
-
-			const res = result.map((el)=>{
+		if (
+			location.href.slice(location.href.lastIndexOf('/') + 1) ===
+			getCookie('id')
+		) {
+			const res = result.map((el) => {
 				return `
 					<div class="videoblock">
-						<a href="/videos/${el.link}"><video class="video" src="/static/videos/${el.link}.mp4" poster></video></a>
+						<a href="/videos/${el.id}"><video class="video" src="/static/videos/${el.link}" poster></video></a>
 						<p>video name: ${el.name}</p>
 						<p>user: <a href="/users/${el.user_id}">${el.user_id}</a></p>
-						<a href="/settings/${el.link}">settings</a>
+						<a href="/settings/${el.id}">settings</a>
 					</div>
-				`
-			})
+				`;
+			});
 
-			return `<div style="margin: 50px"><a href="/videos/newvideo">upload new video</a></div>
+			return (
+				`<div style="margin: 50px"><a href="/videos/newvideo">upload new video</a></div>
 					<h1>Ваши видео:</h1>
 			` + res.join('')
+			);
 		} else {
-
-			const res = result.map((el)=>{
+			const res = result.map((el) => {
 				return `
 					<div class="videoblock">
-						<a href="/videos/${el.link}"><video class="video" src="/static/videos/${el.link}.mp4" poster></video></a>
+						<a href="/videos/${el.id}"><video class="video" src="/static/videos/${el.link}" poster></video></a>
 						<p>video name: ${el.name}</p>
 						<p>user: ${el.user_id}</p>
 					</div>
-				`
-			})
+				`;
+			});
 
-			return `
+			return (
+				`
 					<h1>Видео пользователя:</h1>
-			` + res.join('');
+			` + res.join('')
+			);
 		}
-		
 	}
 }
 
@@ -161,12 +167,26 @@ class Videos extends AbstractView {
 	}
 
 	async getHtml() {
+
+		let response = await fetch(
+			`http://localhost:4000/videos${location.href.slice(
+				location.href.lastIndexOf('/')
+			)}`,
+			{
+				method: `get`,
+			}
+		);
+		const result = await response.json();
+
 		return `
-					<h1>Video</h1>
-			`;
+			<div class="videoblock">
+				<video class="video" src="/static/videos/${result.link}" controls></video>
+				<p>video name: ${result.name}</p>
+				<p>user: <a href="/users/${result.user_id}">${result.user_id}</a></p>
+			</div>
+		`;
 	}
 }
-
 
 class NewVideo extends AbstractView {
 	constructor(params) {
@@ -175,11 +195,10 @@ class NewVideo extends AbstractView {
 	}
 
 	async getHtml() {
-
-		if(!getCookie('id')){
-			navigateTo(`/login`)
+		if (!getCookie('id')) {
+			navigateTo(`/login`);
 		}
-		
+
 		return `
 				<form class="newvideo" onsubmit="upload(); return false">
 					<input class="uploadvideo" type="file" name="filedata">
@@ -203,17 +222,72 @@ class VideoSettings extends AbstractView {
 	}
 
 	async getHtml() {
+
+		let responsePermissions = await fetch(
+			`http://localhost:4000/videos${location.href.slice(
+				location.href.lastIndexOf('/')
+			)}/permissions`,
+			{
+				credentials: `include`,
+				method: `get`,
+			}
+		)
+
+		let responseVideo = await fetch(
+			`http://localhost:4000/videos${location.href.slice(
+				location.href.lastIndexOf('/')
+			)}/settings`,
+			{
+				credentials: `include`,
+				method: `get`,
+			}
+		);
+
+		let permissions = await responsePermissions.json()
+		const video = await responseVideo.json()
+		
+		permissions = permissions.map(perm=>{
+			return `
+				<div style="border: solid 1px black; margin 20px">
+					<p>user id: ${perm.user_id}</p>
+					<p>video id: ${perm.video_id}</p>
+					<p>type: ${perm.type}</p>
+					<buttom onclick="deletePermission(${perm.id})">delete permission</buttom>
+				</div>
+			`
+		})
+
+
 		return `
-					<h1>Video Settings</h1>
-			`;
+						<h3>update video:</h3>
+						<form class="videoupdate" onsubmit="update(); return false">
+						<input class="name" type="text" name="name" placeholder="file name" value="${video.name}">
+						<select class="type" name="type">
+							<option value = "READ_ALL" ${video.type === "READ_ALL" ? 'selected' : ''}>READ_ALL</option>
+							<option value = "READ_AUTH" ${video.type === "READ_AUTH" ? 'selected' : ''}>READ_AUTH</option>
+							<option value = "READ_CHOSEN" ${video.type === "READ_CHOSEN" ? 'selected' : ''}>READ_CHOSEN</option>
+							<option value = "READ_ADMIN" ${video.type === "READ_ADMIN" ? 'selected' : ''}>READ_ADMIN</option>
+						</select>
+						<input class="id" type="hidden" name="id" hidden value="${video.id}">
+						<button type="submit">update</button>
+					</form>
+					<h3>give permission</h3>
+					<form class="newpermission" onsubmit="newPermission(); return false">
+					<input class="id" type="number" name="id" placeholder="user id">
+					<select class="type" name="type">
+						<option value = "WATCH" >WATCH</option>
+						<option value = "ADMIN" >ADMIN</option>
+					</select>
+					<h3>delete permission</h3>
+			` + permissions.join('');
 	}
 }
 
 class Logout extends AbstractView {
 	constructor(params) {
 		super(params);
-		console.log('logout')
-		logout()
+		console.log('logout');
+		logout();
 	}
 
 	async getHtml() {
@@ -277,7 +351,7 @@ const router = async () => {
 
 	const view = new match.route.view(getParams(match));
 
-	console.log(view)
+	console.log(view);
 
 	document.querySelector('#app').innerHTML = await view.getHtml();
 
@@ -298,13 +372,13 @@ const router = async () => {
 	}
 };
 
-window.addEventListener('popstate', router)
+window.addEventListener('popstate', router);
 
-document.querySelector(`.logout`)?.addEventListener('click', (e)=>{
-	e.preventDefault()
-	logout()
-	navigateTo(`/`)
-})
+document.querySelector(`.logout`)?.addEventListener('click', (e) => {
+	e.preventDefault();
+	logout();
+	navigateTo(`/`);
+});
 
 document.addEventListener('DOMContentLoaded', () => {
 	document.body.addEventListener('click', (e) => {
