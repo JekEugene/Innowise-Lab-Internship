@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>video gallery</title>
+		<style>
+			.videoblock {
+				float: left;
+				margin: 40px;
+				border: solid 1px black;
+			}
+			.video {
+				width: 400px;
+				height: 280px;
+			}
+		</style>
+	</head>
+	<body>
+		<nav class="nav"></nav>
+		<div id="app"></div>
+		<script type="module" src="/static/js.js"></script>
+		<script>
+			async function register() {
+				const user = {
+					login: document.querySelector('.login').value,
+					password: document.querySelector('.password').value,
+				};
+				console.log('here1');
+				const response = await fetch(`http://localhost:4000/auth/register`, {
+					method: `POST`,
+					credentials: 'include',
+					headers: {
+						'Content-Type': 'application/json;charset=utf-8',
+					},
+					redirect: 'follow',
+					body: JSON.stringify(user),
+				});
+				let res = await response.text();
+				if(res.includes(`Redirecting`)) {
+					window.location.href = res.slice(res.lastIndexOf('/'))
+				}
+				return false;
+			}
+
+			async function log_in() {
+				const user = {
+					login: document.querySelector('.login').value,
+					password: document.querySelector('.password').value,
+				};
+				const response = await fetch(`http://localhost:4000/auth/login`, {
+					method: `POST`,
+					credentials: 'include',
+					headers: {
+						'Content-Type': 'application/json;charset=utf-8',
+					},
+					body: JSON.stringify(user),
+				});
+				let res = await response.text();
+				if(res.includes(`Redirecting`)) {
+					window.location.href = res.slice(res.lastIndexOf('/'))
+				}
+				return false;
+			}
+		</script>
+	</body>
+</html>
