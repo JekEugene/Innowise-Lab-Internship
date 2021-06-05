@@ -6,9 +6,9 @@ import {
 	ManyToOne,
 	JoinColumn,
 	OneToMany,
-} from "typeorm"
-import { User } from "../users/users.model"
-import { Permission } from "./permissions.model"
+} from 'typeorm'
+import { User } from '../users/users.model'
+import { Permission } from './permissions.model'
 @Entity()
 export class Video extends BaseEntity {
 	@PrimaryGeneratedColumn()

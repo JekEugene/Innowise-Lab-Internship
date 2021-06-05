@@ -1,8 +1,8 @@
-import { Express, Request } from "express"
-import multer from "multer"
+import { Express, Request } from 'express'
+import multer from 'multer'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
-import path from "path"
+import path from 'path'
 
 export function middleware(app: Express, express): void {
 	app.use(express.json())

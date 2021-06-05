@@ -1,5 +1,5 @@
-import { Router, Request, Response  } from "express"
-import { authService } from "../auth/authorization.service"
+import { Router, Request, Response  } from 'express'
+import { authService } from '../auth/authorization.service'
 const homeController = Router()
 
 import { homeService } from './home.service'

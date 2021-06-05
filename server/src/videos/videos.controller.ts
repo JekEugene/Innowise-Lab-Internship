@@ -1,10 +1,10 @@
-import { Router, Request, Response } from "express"
-import { authService } from "../auth/authorization.service"
-import { ICreatePermissionDto } from "./dto/create-permission.dto"
-import { ICreateVideoDto } from "./dto/create-video.dto"
-import { IUpdateVideoDto } from "./dto/update-video.dto"
-import { Permission } from "./permissions.model"
-import { Video } from "./videos.model"
+import { Router, Request, Response } from 'express'
+import { authService } from '../auth/authorization.service'
+import { ICreatePermissionDto } from './dto/create-permission.dto'
+import { ICreateVideoDto } from './dto/create-video.dto'
+import { IUpdateVideoDto } from './dto/update-video.dto'
+import { Permission } from './permissions.model'
+import { Video } from './videos.model'
 const videoController = Router()
 
 import { videoService } from './videos.service'
@@ -35,7 +35,6 @@ videoController.get(`/:id/settings`, async (req: Request, res: Response) => {
 
 videoController.get(`/:id/permissions`, async (req: Request, res: Response) => {
 	const permissions: Permission[] = await videoService.getVideoPermissions(+req.params.id)
-	console.log(permissions)
 	res.status(200).json(permissions)
 })
 

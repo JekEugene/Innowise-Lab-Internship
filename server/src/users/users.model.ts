@@ -4,7 +4,7 @@ import {
 	Column,
 	BaseEntity,
 	OneToMany,
-} from "typeorm"
+} from 'typeorm'
 
 import { Video } from '../videos/videos.model'
 import { Token } from '../auth/tokens.model'

@@ -5,8 +5,8 @@ import {
 	BaseEntity,
 	ManyToOne,
 	JoinColumn,
-} from "typeorm"
-import { User } from "../users/users.model"
+} from 'typeorm'
+import { User } from '../users/users.model'
 
 @Entity()
 export class Token extends BaseEntity {

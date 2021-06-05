@@ -7,7 +7,6 @@ import { Token } from './tokens.model'
 import { IUserPayload } from './user-payload.interface'
 
 export const authenticationService = {
-
 	async findUser(login: string): Promise<User> {
 		return await User.findOne({ where: { login } })
 	},
@@ -19,12 +18,9 @@ export const authenticationService = {
 	async createUser(user: ICreateUserDto): Promise<User> {
 		return await User.create(user).save()
 	},
-	
+
 	async comparePasswords(user: User, password: string): Promise<boolean> {
-		return await bcrypt.compare(
-			password,
-			user.password,
-		)
+		return await bcrypt.compare(password, user.password)
 	},
 
 	async createRefreshToken(user_id: number, token: string): Promise<Token> {
@@ -32,22 +28,18 @@ export const authenticationService = {
 	},
 
 	signAccessToken(userPayload: IUserPayload): string {
-		return jwt.sign(
-			userPayload,
-			process.env.ACCESS_SECRET_TOKEN,
-			{ expiresIn: `10s` }
-		)
+		return jwt.sign(userPayload, process.env.ACCESS_SECRET_TOKEN, {
+			expiresIn: `10s`,
+		})
 	},
 	signRefreshToken(userPayload: IUserPayload): string {
-		return jwt.sign(
-			userPayload,
-			process.env.REFRESH_SECRET_TOKEN,
-			{ expiresIn: `15d` }
-		)
+		return jwt.sign(userPayload, process.env.REFRESH_SECRET_TOKEN, {
+			expiresIn: `15d`,
+		})
 	},
-	
+
 	deleteToken(token: string, userId: number): Promise<void> {
 		Token.delete({ user_id: userId, token })
 		return
-	}
+	},
 }

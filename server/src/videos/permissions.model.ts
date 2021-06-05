@@ -5,9 +5,9 @@ import {
 	BaseEntity,
 	ManyToOne,
 	JoinColumn,
-} from "typeorm"
-import { User } from "../users/users.model"
-import { Video } from "./videos.model"
+} from 'typeorm'
+import { User } from '../users/users.model'
+import { Video } from './videos.model'
 
 @Entity()
 export class Permission extends BaseEntity {

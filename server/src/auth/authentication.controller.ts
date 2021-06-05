@@ -1,9 +1,9 @@
-import { Router, Request, Response } from "express"
-import { ICreateUserDto } from "../users/dto/create-user.dto"
-import { IUserPayload } from "./user-payload.interface"
+import { Router, Request, Response } from 'express'
+import { ICreateUserDto } from '../users/dto/create-user.dto'
+import { IUserPayload } from './user-payload.interface'
 const authController = Router()
 import { authenticationService } from './authentication.service'
-import { authService } from "./authorization.service"
+import { authService } from './authorization.service'
 
 authController.post(`/register`, async (req: Request, res: Response) => {
 	const { login, password } = req.body
@@ -14,7 +14,7 @@ authController.post(`/register`, async (req: Request, res: Response) => {
 	const hashPassword = await authenticationService.hashPassword(password)
 	const newUser: ICreateUserDto = {
 		login,
-		password: hashPassword
+		password: hashPassword,
 	}
 	authenticationService.createUser(newUser)
 	return res.redirect(201, `/login`)
@@ -26,14 +26,15 @@ authController.post(`/login`, async (req: Request, res: Response) => {
 	if (!user) {
 		return res.status(401).send(`user does not exist`)
 	}
-	const arePasswordsSame: boolean = await authenticationService.comparePasswords(user, password)
+	const arePasswordsSame: boolean =
+		await authenticationService.comparePasswords(user, password)
 	if (!arePasswordsSame) {
 		return res.status(401).send(`wrong password`)
 	}
 
 	const userPayload: IUserPayload = {
 		id: user.id,
-		login: user.login
+		login: user.login,
 	}
 
 	const refreshToken = authenticationService.signRefreshToken(userPayload)
@@ -50,21 +51,29 @@ authController.post(`/login`, async (req: Request, res: Response) => {
 		httpOnly: true,
 		path: `/`,
 	})
-	res.cookie(`id`, user.id, {path: `/`})
-	res.cookie(`login`, user.login, {path: `/`})
+	res.cookie(`id`, user.id, { path: `/` })
+	res.cookie(`login`, user.login, { path: `/` })
 	return res.redirect(200, `/`)
 })
 
-authController.get(`/logout`, authService.authUser, async (req: Request, res: Response) => {
-	if (!res.locals.auth) {
-		return res.status(401).send(`you are not logged in`)
+authController.get(
+	`/logout`,
+	authService.authUser,
+	async (req: Request, res: Response) => {
+		if (!res.locals.auth) {
+			return res.status(401).send(`you are not logged in`)
+		}
+		authenticationService.deleteToken(
+			res.locals.refreshToken,
+			res.locals.user.id
+		)
+		res
+			.clearCookie(`accessToken`)
+			.clearCookie(`refreshToken`)
+			.clearCookie(`id`)
+			.clearCookie(`login`)
+		return res.redirect(200, `/`)
 	}
-	authenticationService.deleteToken(res.locals.refreshToken, res.locals.user.id)
-	res.clearCookie(`accessToken`)
-		.clearCookie(`refreshToken`)
-		.clearCookie(`id`)
-		.clearCookie(`login`)
-	return res.redirect(200, `/`)
-})
+)
 
 export = authController

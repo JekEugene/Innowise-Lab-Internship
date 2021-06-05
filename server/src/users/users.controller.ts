@@ -1,7 +1,7 @@
-import { Router, Request, Response } from "express"
-import { authService } from "../auth/authorization.service"
-import { Video } from "../videos/videos.model"
-import { User } from "./users.model"
+import { Router, Request, Response } from 'express'
+import { authService } from '../auth/authorization.service'
+import { Video } from '../videos/videos.model'
+import { User } from './users.model'
 const userController = Router()
 
 import { userService } from './users.service'
