@@ -1,37 +1,18 @@
-import { Request, Response } from 'express'
-//import { Permission } from '../videos/permissions.model'
+import { getRepository } from 'typeorm'
 import { Video } from '../videos/videos.model'
 
 export const homeService = {
-	async homePage(req: Request, res: Response): Promise<void> {
-		if(res.locals.auth === true){
-			const videos = await Video.find({
-				where: [
-					{ type: `READ_ALL` },
-					{ type: `READ_AUTH` },
-				],
-			})
-			const sendVideos = videos.map(video => {
-				return { name: video.name, link: video.link}
-			})
-			
-			res.cookie(`id`, res.locals.user.id)
-			res.cookie(`login`, res.locals.user.login)
-			res.cookie(`auth`, res.locals.auth)
-
-			res.status(200).json(sendVideos)
-		} else {
-			const videos = await Video.find({
-				where: [
-					{ type: `READ_ALL` },
-				],
-			})
-			const sendVideos = videos.map(video => {
-				return { name: video.name, link: video.link}
-			})
-
-			res.cookie(`auth`, res.locals.auth)
-			res.status(200).json(sendVideos)
-		}
+	async getVideos(isAuth: boolean, userId: number): Promise<Video[]> {
+		return await getRepository(Video).createQueryBuilder(`video`)
+			.leftJoin(`video.permissions`, `permission`)
+			.where(`video.type = 'READ_ALL'`)
+			.orWhere(`video.type = 'READ_AUTH' and :isAuth=true`, { isAuth })
+			.orWhere(`video.type = 'READ_CHOSEN' and permission.user_id = :userId and
+			permission.video_id = video.id`, { userId })
+			.orWhere(`video.type = 'READ_CHOSEN' and video.user_id = :userId`, { userId })
+			.orWhere(`video.type = 'READ_ADMIN' and permission.user_id = :userId and
+			permission.video_id = video.id and permission.type = 'ADMIN'`, { userId })
+			.orWhere(`video.type = 'READ_ADMIN' and video.user_id = :userId`, { userId })
+			.getMany()
 	}
 }
