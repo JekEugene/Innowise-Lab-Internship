@@ -9,11 +9,10 @@ import { homeService } from './home.service'
  * @swagger
  * /:
  *   get:
- *     description: Get all videos
+ *     summary: Get all videos, which you can watch
  *     responses:
  *       200:
  *         description: Success
- * 
  */
 homeController.get(`/`, authService.authUser, async (req: Request, res: Response) => {
 	const videos = await homeService.getVideos(res.locals.auth, res.locals.user?.id)

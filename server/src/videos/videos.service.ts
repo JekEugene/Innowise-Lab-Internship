@@ -59,7 +59,7 @@ export const videoService = {
 			video_id: createPermission.video_id,
 			type: createPermission.type
 		}, {relations: [`video`]})
-		if (permission || permission.video.user_id !== userId) {
+		if (permission || permission?.video.user_id !== userId) {
 			return false
 		}
 		return true

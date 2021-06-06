@@ -90,15 +90,13 @@ class AllUsers extends AbstractView {
 		const res = result.map((el) => {
 			return `
 				<div class="userblock">
-					<p>user name: <a href="/users/${el.id}">${el.name}</a></p>
+					<p>user name: <a href="/users/${el.id}">${el.login}</a></p>
 					<p>user id: ${el.id}</p>
 				</div>
 			`;
 		});
 
-		return `
-					<h1>Ваши видео:</h1>
-			`;
+		return `<h3>User list:</h3>` + res.join(``);
 	}
 }
 
@@ -368,11 +366,13 @@ const router = async () => {
 			<a href="/users/${getCookie('id')}" class="nav__link" data-link>${getCookie(
 			'login'
 		)}</a>
+			<a href="/users" class="nav__link" data-link>user list</a>
 			<a href="/logout" class="nav__link logout" data-link>logout</a>
 		`;
 	} else {
 		document.querySelector('.nav').innerHTML = `
 			<a href="/" class="nav__link" data-link>home</a>
+			<a href="/users" class="nav__link" data-link>user list</a>
 			<a href="/login" class="nav__link" data-link>login</a>
 			<a href="/register" class="nav__link" data-link>register</a>
 		`;

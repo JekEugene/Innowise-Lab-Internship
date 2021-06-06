@@ -6,6 +6,7 @@ export const userService = {
 	async getAllUsers() :Promise<User[]> {
 		return await User.find()
 	},
+
 	async getUserVideos(isAuth: boolean, userId: number, targetId: number): Promise<Video[]> {
 		return await getRepository(Video).createQueryBuilder(`video`)
 			.leftJoin(`video.permissions`, `permission`)
@@ -21,7 +22,12 @@ export const userService = {
 					.orWhere(`video.type = 'READ_ADMIN' and video.user_id = :userId`, { userId })
 			}))
 			.getMany()
-	}
+	},
+
+	async isUserExist(id: number) :Promise<boolean> {
+		const user = await User.findOne(id)
+		return user ? true : false
+	},
 }
 
 
