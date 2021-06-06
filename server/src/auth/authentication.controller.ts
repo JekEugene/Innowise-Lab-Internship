@@ -113,14 +113,6 @@ authController.post(`/login`, async (req: Request, res: Response) => {
  *     tags:
  *     - auth 
  *     parameters:
- *     - in: cookie
- *       name: accessToken
- *       type: string
- *       required: false
- *     - in: cookie
- *       name: refreshToken
- *       type: string
- *       required: true
  *     responses:
  *       200:
  *         description: Success

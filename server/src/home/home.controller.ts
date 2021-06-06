@@ -13,14 +13,6 @@ import { homeService } from './home.service'
  *     tags:
  *     - home
  *     parameters:
- *     - in: cookie
- *       name: accessToken
- *       type: string
- *       required: false
- *     - in: cookie
- *       name: refreshToken
- *       type: string
- *       required: false
  *     responses:
  *       200:
  *         description: Success

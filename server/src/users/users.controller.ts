@@ -37,14 +37,6 @@ userController.get(`/`, async (req: Request, res: Response) => {
  *       name: userId
  *       type: integer
  *       required: true
- *     - in: cookie
- *       name: accessToken
- *       type: string
- *       required: false
- *     - in: cookie
- *       name: refreshToken
- *       type: string
- *       required: false
  *     responses:
  *       200:
  *         description: Success

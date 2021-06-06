@@ -32,14 +32,6 @@ import { videoService } from './videos.service'
  *       name: type
  *       type: string
  *       required: true
- *     - in: cookie
- *       name: accessToken
- *       type: string
- *       required: false
- *     - in: cookie
- *       name: refreshToken
- *       type: string
- *       required: true
  *     responses:
  *       200:
  *         description: Success
@@ -109,14 +101,6 @@ videoController.get(`/:id`, authService.authUser.bind(authService), async (req: 
  *       name: videoId
  *       type: string
  *       required: true
- *     - in: cookie
- *       name: accessToken
- *       type: string
- *       required: false
- *     - in: cookie
- *       name: refreshToken
- *       type: string
- *       required: true
  *     responses:
  *       200:
  *         description: Success
@@ -159,14 +143,6 @@ videoController.get(`/:id/settings`, async (req: Request, res: Response) => {
  *       required: true
  *     - in: body
  *       name: type
- *       type: string
- *       required: true
- *     - in: cookie
- *       name: accessToken
- *       type: string
- *       required: false
- *     - in: cookie
- *       name: refreshToken
  *       type: string
  *       required: true
  *     responses:
@@ -213,14 +189,6 @@ videoController.get(`/:id/permissions`, authService.authUser.bind(authService), 
  *       name: type
  *       type: string
  *       required: true
- *     - in: cookie
- *       name: accessToken
- *       type: string
- *       required: false
- *     - in: cookie
- *       name: refreshToken
- *       type: string
- *       required: true
  *     responses:
  *       200:
  *         description: Success
@@ -260,14 +228,6 @@ videoController.patch(`/updatevideo`, authService.authUser.bind(authService), as
  *     - in: body
  *       name: id
  *       type: number
- *       required: true
- *     - in: cookie
- *       name: accessToken
- *       type: string
- *       required: false
- *     - in: cookie
- *       name: refreshToken
- *       type: string
  *       required: true
  *     responses:
  *       200:
@@ -310,14 +270,6 @@ videoController.delete(`/deletevideo`, authService.authUser.bind(authService), a
  *       required: true
  *     - in: body
  *       name: type
- *       type: string
- *       required: true
- *     - in: cookie
- *       name: accessToken
- *       type: string
- *       required: false
- *     - in: cookie
- *       name: refreshToken
  *       type: string
  *       required: true
  *     responses:
@@ -364,14 +316,6 @@ videoController.post(`/createpermission`, authService.authUser.bind(authService)
  *     - in: body
  *       name: id
  *       type: number
- *       required: true
- *     - in: cookie
- *       name: accessToken
- *       type: string
- *       required: false
- *     - in: cookie
- *       name: refreshToken
- *       type: string
  *       required: true
  *     responses:
  *       200:
