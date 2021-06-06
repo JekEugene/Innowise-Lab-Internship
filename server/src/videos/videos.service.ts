@@ -5,39 +5,39 @@ import { IUpdateVideoDto } from './dto/update-video.dto'
 import { Permission } from './permissions.model'
 import { Video } from './videos.model'
 
-export const videoService = {
-	async createVideo(newVideo: ICreateVideoDto): Promise<void> {
+class VideoService {
+	public async createVideo(newVideo: ICreateVideoDto): Promise<void> {
 		Video.create(newVideo).save()
-	},
+	}
 
-	async getVideo(id: number): Promise<Video> {
+	public async getVideo(id: number): Promise<Video> {
 		return await Video.findOne(id)
-	},
+	}
 
-	async updateVideo(id: number, updateVideo: IUpdateVideoDto): Promise<void> {
+	public async updateVideo(id: number, updateVideo: IUpdateVideoDto): Promise<void> {
 		await Video.update({ id },{ ...updateVideo })
-	},
+	}
 	
-	async validateUpdate(userId: number, videoId: number): Promise<boolean> {
+	public async validateUpdate(userId: number, videoId: number): Promise<boolean> {
 		const video: Video = await Video.findOne(videoId)
 		return video.user_id === userId ? true : false
-	},
+	}
 
-	async deleteVideo(id: number): Promise<void> {
+	public async deleteVideo(id: number): Promise<void> {
 		Permission.delete({ video_id: id })
 		Video.delete(id)
-	},
+	}
 
-	async getVideoPermissions(videoId: number): Promise<Permission[]> {
+	public async getVideoPermissions(videoId: number): Promise<Permission[]> {
 		const permission: Permission[] = await Permission.find({ where: {video_id: videoId}})
 		return permission
-	},
+	}
 	
-	async createPermission(createPermission: ICreatePermissionDto): Promise<void> {
+	public async createPermission(createPermission: ICreatePermissionDto): Promise<void> {
 		Permission.create(createPermission).save()
-	},
+	}
 
-	async validateCreatePermission(createPermission: ICreatePermissionDto): Promise<boolean> {
+	public async validateCreatePermission(createPermission: ICreatePermissionDto): Promise<boolean> {
 		const permission: Permission = await Permission.findOne({
 			user_id: createPermission.user_id,
 			video_id: createPermission.video_id,
@@ -47,13 +47,13 @@ export const videoService = {
 			return false
 		}
 		return true
-	},
+	}
 
-	async deletePermission(id: number): Promise<void> {
+	public async deletePermission(id: number): Promise<void> {
 		Permission.delete(id)
-	},
+	}
 
-	async validateIsUserHavePermission(userId: number, videoId: number): Promise<boolean> {
+	public async validateIsUserHavePermission(userId: number, videoId: number): Promise<boolean> {
 		const video: Video = await Video.findOne(videoId, {relations: [`permissions`]})
 		
 		if (video.user_id === userId) {
@@ -66,20 +66,38 @@ export const videoService = {
 				return false
 			}
 		})
-	},
+	}
 
-	async validateIsUserCanWatch(userId: number, videoId: number): Promise<boolean> {
-		const video: Video = await Video.findOne(videoId, {relations: [`permissions`]})
+	public async validateIsUserCanWatch(userId: number, videoId: number): Promise<boolean> {
+		const video: Video = await Video.findOne(videoId, { relations: [`permissions`] })
 		if (video.user_id === userId) {
 			return true
 		}
-		return video.permissions.some(permission => {
-			if (permission.user_id === userId) {
-				return true
-			} else {
-				return false
-			}
-		})
+		switch (video.type) {
+		case `READ_ALL`:
+			return true
+		case `READ_AUTH`:
+			return userId ? true : false
+		case `READ_CHOSEN`:
+			return video.permissions.some(permission => {
+				if (permission.user_id === userId) {
+					return true
+				} else {
+					return false
+				}
+			})
+		case `READ_ADMIN`:
+			return video.permissions.some(permission => {
+				if (permission.user_id === userId && permission.type === `ADMIN`) {
+					return true
+				} else {
+					return false
+				}
+			})	
+		default:
+			return false
+		}
 	}
-	
 }
+
+export const videoService = new VideoService()
