@@ -6,7 +6,16 @@ const userController = Router()
 
 import { userService } from './users.service'
 
-
+/**
+ * @swagger
+ * /users/:
+ *   get:
+ *     description: Get all users
+ *     responses:
+ *       200:
+ *         description: Success
+ * 
+ */
 userController.get(`/`, async (req: Request, res: Response) => {
 	const users: User[] = await userService.getAllUsers()
 	const sendUsers = users.map(user => {

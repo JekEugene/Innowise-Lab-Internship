@@ -3,6 +3,8 @@ import multer from 'multer'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import path from 'path'
+import swaggerJsDoc from 'swagger-jsdoc'
+import swaggerUI from 'swagger-ui-express'
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function middleware(app: Express, express): void {
@@ -13,7 +15,7 @@ export function middleware(app: Express, express): void {
 		methods: [`GET`, `PUT`, `POST`, `PATCH`, `DELETE`, `OPTIONS`],
 		optionsSuccessStatus: 204,
 		credentials: true,
-		allowedHeaders: [`Content-Type`, `Authorization`, `X-Requested-With`, `device-remember-token`, `Access-Control-Allow-Origin`, `Origin`, `Accept`]
+		allowedHeaders: [`Content-Type`, `Authorization`, `X-Requested-With`, `Access-Control-Allow-Origin`, `Origin`, `Accept`]
 	}
 	app.use(cors(corsOptions))
 	
@@ -42,5 +44,19 @@ export function middleware(app: Express, express): void {
 	
 	app.use(express.static(__dirname))
 	
-	app.use(multer({storage:storageConfig, fileFilter: fileFilter}).single(`filedata`))
+	app.use(multer({ storage: storageConfig, fileFilter: fileFilter }).single(`filedata`))
+	
+	const swaggerOptions = {
+		swaggerDefinition: {
+			info: {
+				title: `Video Gallery API`,
+				version: `1.0.0`,
+			},
+		},
+		apis: [`./src/home/home.controller.ts`, `./src/users/users.controller.ts`,
+			`./src/videos/videos.controller.ts`, `./src/auth/authentication.controller.ts`],
+	}
+	
+	const swaggerDocs = swaggerJsDoc(swaggerOptions)
+	app.use(`/api-docs`, swaggerUI.serve, swaggerUI.setup(swaggerDocs))
 }
