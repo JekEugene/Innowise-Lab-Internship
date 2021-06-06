@@ -1,10 +1,7 @@
-import { getRepository } from 'typeorm'
-import { ICreatePermissionDto } from './dto/create-permission.dto'
 import { ICreateVideoDto } from './dto/create-video.dto'
 import { IUpdateVideoDto } from './dto/update-video.dto'
 import { Permission } from './permissions.model'
 import { Video } from './videos.model'
-
 class VideoService {
 	public async createVideo(newVideo: ICreateVideoDto): Promise<void> {
 		Video.create(newVideo).save()
@@ -27,32 +24,7 @@ class VideoService {
 		Permission.delete({ video_id: id })
 		Video.delete(id)
 	}
-
-	public async getVideoPermissions(videoId: number): Promise<Permission[]> {
-		const permission: Permission[] = await Permission.find({ where: {video_id: videoId}})
-		return permission
-	}
 	
-	public async createPermission(createPermission: ICreatePermissionDto): Promise<void> {
-		Permission.create(createPermission).save()
-	}
-
-	public async validateCreatePermission(createPermission: ICreatePermissionDto): Promise<boolean> {
-		const permission: Permission = await Permission.findOne({
-			user_id: createPermission.user_id,
-			video_id: createPermission.video_id,
-			type: createPermission.type
-		}, {relations: [`video`]})
-		if (permission) {
-			return false
-		}
-		return true
-	}
-
-	public async deletePermission(id: number): Promise<void> {
-		Permission.delete(id)
-	}
-
 	public async validateIsUserHavePermission(userId: number, videoId: number): Promise<boolean> {
 		const video: Video = await Video.findOne(videoId, {relations: [`permissions`]})
 		

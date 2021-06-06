@@ -4,6 +4,7 @@ import { ICreatePermissionDto } from './dto/create-permission.dto'
 import { ICreateVideoDto } from './dto/create-video.dto'
 import { IUpdateVideoDto } from './dto/update-video.dto'
 import { Permission } from './permissions.model'
+import { permissionService } from './permissions.service'
 import { Video } from './videos.model'
 const videoController = Router()
 
@@ -186,7 +187,7 @@ videoController.get(`/:id/permissions`, authService.authUser.bind(authService), 
 	if (!isUserHavePermission) {
 		return res.status(403).send(`you can't get permission of this video`)
 	}
-	const permissions: Permission[] = await videoService.getVideoPermissions(videoId)
+	const permissions: Permission[] = await permissionService.getVideoPermissions(videoId)
 	return res.status(200).json(permissions)
 })
 
@@ -341,12 +342,12 @@ videoController.post(`/createpermission`, authService.authUser.bind(authService)
 		res.status(403).send(`you don't have permissions of this video`)
 	}
 
-	const validate: boolean = await videoService.validateCreatePermission(newPermission)
+	const validate: boolean = await permissionService.validateCreatePermission(newPermission)
 	if (!validate) {
 		return res.status(422).send(`permission already exists`)
 	}
 	
-	videoService.createPermission(newPermission)
+	permissionService.createPermission(newPermission)
 	return res.status(200).send(`permission created`)
 })
 
@@ -392,7 +393,7 @@ videoController.delete(`/deletepermission`, authService.authUser.bind(authServic
 	if (!isUserHavePermission) {
 		res.status(403).send(`you don't have permissions of this video`)
 	}
-	videoService.deletePermission(videoId)
+	permissionService.deletePermission(videoId)
 	return res.status(200).send(`permission deleted`)
 })
 
