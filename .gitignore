@@ -4,5 +4,6 @@ server/node_modules
 server/.env
 server/dist
 server/videos
+server/info.log
 client/node_modules
 client/static/videos
