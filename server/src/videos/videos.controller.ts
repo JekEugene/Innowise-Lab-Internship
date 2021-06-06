@@ -10,13 +10,14 @@ const videoController = Router()
 import { videoService } from './videos.service'
 
 videoController.post(`/newvideo`, authService.authUser, async (req: Request, res: Response) => {
+	const { name, link, type } = req.body
 	const filedata = req.file
 	if(!filedata)
 		return res.status(400).send(`Error uploading file`)
 	const newVideo: ICreateVideoDto = {
-		name: req.body.name,
-		link: req.body.link,
-		type: req.body.type,
+		name,
+		link,
+		type,
 		user_id: res.locals.user.id
 	}
 	videoService.createVideo(newVideo)
@@ -42,15 +43,16 @@ videoController.patch(`/updatevideo`, authService.authUser, async (req: Request,
 	if (!res.locals.auth) {
 		return res.status(401).send(`you are not logged in`)
 	}
+	const { id, name, type } = req.body
 	const updateVideo: IUpdateVideoDto = {
-		name: req.body.name,
-		type: req.body.type
+		name,
+		type
 	}
-	const validate = await videoService.validateUpdate(req.body.id, res.locals.user.id)
+	const validate = await videoService.validateUpdate(id, res.locals.user.id)
 	if(!validate){
 		return res.status(401).send(`validate error`)
 	}
-	videoService.updateVideo(req.body.id, updateVideo)
+	videoService.updateVideo(id, updateVideo)
 	return res.status(200).send(`video updated`)
 })
 
@@ -58,11 +60,12 @@ videoController.delete(`/deletevideo`, authService.authUser, async (req: Request
 	if (!res.locals.auth) {
 		return res.status(401).send(`you are not logged in`)
 	}
-	const validate: boolean = await videoService.validateDeleteVideo(res.locals.user.id, req.body.id)
+	const { id } = req.body
+	const validate: boolean = await videoService.validateDeleteVideo(res.locals.user.id, id)
 	if (!validate) {
 		return res.status(401).send(`validate error`)
 	}
-	videoService.deleteVideo(req.body.id)
+	videoService.deleteVideo(id)
 	return res.status(200).send(`video deleted`)
 })
 
@@ -83,11 +86,12 @@ videoController.delete(`/deletepermission`, authService.authUser, async (req: Re
 	if (!res.locals.auth) {
 		return res.status(401).send(`you are not logged in`)
 	}
-	const validate: boolean = await videoService.validateDeletePermission(res.locals.user.id, req.body.id)
+	const { id } = req.body
+	const validate: boolean = await videoService.validateDeletePermission(res.locals.user.id, id)
 	if (!validate) {
 		return res.status(401).send(`validate error`)
 	}
-	videoService.deletePermission(req.body.id)
+	videoService.deletePermission(id)
 	return res.status(200).send(`permission deleted`)
 })
 
