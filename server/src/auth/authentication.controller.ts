@@ -5,11 +5,36 @@ const authController = Router()
 import { authenticationService } from './authentication.service'
 import { authService } from './authorization.service'
 
+
+/**
+ * @swagger
+ * /auth/register:
+ *   post:
+ *     consumes:
+ *      - application/json
+ *     summary: create account
+ *     tags:
+ *     - auth
+ *     parameters:
+ *     - in: body
+ *       name: login
+ *       type: string
+ *       required: true
+ *     - in: body
+ *       name: password
+ *       type: string
+ *       required: true
+ *     responses:
+ *       200:
+ *         description: Success
+ *       422:
+ *         description: User already exists
+ */
 authController.post(`/register`, async (req: Request, res: Response) => {
 	const { login, password } = req.body
 	const user = await authenticationService.findUser(login)
 	if (user) {
-		return res.status(422).send(`user already exist`)
+		return res.status(422).send(`user already exists`)
 	}
 	const hashPassword = await authenticationService.hashPassword(password)
 	const newUser: ICreateUserDto = {
@@ -20,16 +45,40 @@ authController.post(`/register`, async (req: Request, res: Response) => {
 	return res.redirect(201, `/login`)
 })
 
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     consumes:
+ *     - application/json
+ *     summary: login to account
+ *     tags:
+ *     - auth
+ *     parameters:
+ *     - in: body
+ *       name: login
+ *       type: string
+ *       required: true
+ *     - in: body
+ *       name: password
+ *       type: string
+ *       required: true
+ *     responses:
+ *       200:
+ *         description: Success
+ *       401:
+ *         description: Login or password incorrect
+ */
 authController.post(`/login`, async (req: Request, res: Response) => {
 	const { login, password } = req.body
 	const user = await authenticationService.findUser(login)
 	if (!user) {
-		return res.status(401).send(`user does not exist`)
+		return res.status(401).send(`Login or password incorrect`)
 	}
 	const arePasswordsSame: boolean =
 		await authenticationService.comparePasswords(user, password)
 	if (!arePasswordsSame) {
-		return res.status(401).send(`wrong password`)
+		return res.status(401).send(`Login or password incorrect`)
 	}
 
 	const userPayload: IUserPayload = {
@@ -56,6 +105,28 @@ authController.post(`/login`, async (req: Request, res: Response) => {
 	return res.redirect(200, `/`)
 })
 
+/**
+ * @swagger
+ * /auth/logout:
+ *   get:
+ *     summary: logout from accout
+ *     tags:
+ *     - auth 
+ *     parameters:
+ *     - in: cookie
+ *       name: accessToken
+ *       type: string
+ *       required: false
+ *     - in: cookie
+ *       name: refreshToken
+ *       type: string
+ *       required: true
+ *     responses:
+ *       200:
+ *         description: Success
+ *       401:
+ *         description: You are not logged in
+ */
 authController.get(
 	`/logout`,
 	authService.authUser,
@@ -67,8 +138,7 @@ authController.get(
 			res.locals.refreshToken,
 			res.locals.user.id
 		)
-		res
-			.clearCookie(`accessToken`)
+		res.clearCookie(`accessToken`)
 			.clearCookie(`refreshToken`)
 			.clearCookie(`id`)
 			.clearCookie(`login`)

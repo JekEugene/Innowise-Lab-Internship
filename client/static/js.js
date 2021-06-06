@@ -171,6 +171,7 @@ class Videos extends AbstractView {
 				location.href.lastIndexOf('/')
 			)}`,
 			{
+				credentials: `include`,
 				method: `get`,
 			}
 		);

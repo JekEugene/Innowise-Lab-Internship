@@ -11,6 +11,8 @@ import { userService } from './users.service'
  * /users/:
  *   get:
  *     summary: Get all users
+ *     tags:
+ *     - users
  *     responses:
  *       200:
  *         description: Success
@@ -24,25 +26,33 @@ userController.get(`/`, async (req: Request, res: Response) => {
 })
 
 /**
-* @swagger
-* /users/{userid}:
-*   get:
-*     summary: Get all user videos, which you can watch
-*     parameters:
-*      - in: path
-*        name: userId
-*        schema:
-*          type: integer
-*        required: true
-*        description: Numeric ID of the user to get
-*     responses:
-*       200:
-*         description: Success
-*				400:
-*					description: The specified user ID is invalid (e.g. not an integer)
-*				404:
-*					description: A user with the specified ID was not found
-*/
+ * @swagger
+ * /users/{userid}:
+ *   get:
+ *     summary: Get all user videos, which you can watch
+ *     tags:
+ *     - users
+ *     parameters:
+ *     - in: path
+ *       name: userId
+ *       type: integer
+ *       required: true
+ *     - in: cookie
+ *       name: accessToken
+ *       type: string
+ *       required: false
+ *     - in: cookie
+ *       name: refreshToken
+ *       type: string
+ *       required: false
+ *     responses:
+ *       200:
+ *         description: Success
+ *       400:
+ *         description: The specified user ID is invalid (e.g. not an integer)
+ *       404:
+ *         description: A user with the specified ID was not found
+ */
 userController.get(`/:id`, authService.authUser, async (req: Request, res: Response) => {
 	const id: number = +req.params.id
 	if (!Number.isInteger(id)) {

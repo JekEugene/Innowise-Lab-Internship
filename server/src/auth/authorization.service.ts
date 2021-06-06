@@ -19,7 +19,7 @@ export const authService = {
 						console.log(err)
 						await refreshToken(req, res)
 						return next()
-					} 
+					}
 					res.locals.auth = true
 					res.locals.user = user
 					return next()

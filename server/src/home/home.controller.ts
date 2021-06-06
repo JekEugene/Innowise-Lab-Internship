@@ -10,6 +10,17 @@ import { homeService } from './home.service'
  * /:
  *   get:
  *     summary: Get all videos, which you can watch
+ *     tags:
+ *     - home
+ *     parameters:
+ *     - in: cookie
+ *       name: accessToken
+ *       type: string
+ *       required: false
+ *     - in: cookie
+ *       name: refreshToken
+ *       type: string
+ *       required: false
  *     responses:
  *       200:
  *         description: Success
@@ -17,7 +28,7 @@ import { homeService } from './home.service'
 homeController.get(`/`, authService.authUser, async (req: Request, res: Response) => {
 	const videos = await homeService.getVideos(res.locals.auth, res.locals.user?.id)
 	const sendVideos = videos.map(video => {
-		return { name: video.name, link: video.link, user_id: video.user_id }
+		return { id: video.id, name: video.name, link: video.link, user_id: video.user_id }
 	})
 	res.status(200).json(sendVideos)
 })
