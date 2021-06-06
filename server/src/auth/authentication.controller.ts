@@ -129,7 +129,7 @@ authController.post(`/login`, async (req: Request, res: Response) => {
  */
 authController.get(
 	`/logout`,
-	authService.authUser,
+	authService.authUser.bind(authService),
 	async (req: Request, res: Response) => {
 		if (!res.locals.auth) {
 			return res.status(401).send(`you are not logged in`)

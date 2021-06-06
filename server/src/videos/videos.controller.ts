@@ -45,7 +45,7 @@ import { videoService } from './videos.service'
  *       400:
  *         description: Error uploading file
  */
-videoController.post(`/newvideo`, authService.authUser, async (req: Request, res: Response) => {
+videoController.post(`/newvideo`, authService.authUser.bind(authService), async (req: Request, res: Response) => {
 	const { name, link, type } = req.body
 	const user_id = res.locals.user.id
 	const filedata = req.file
@@ -79,7 +79,7 @@ videoController.post(`/newvideo`, authService.authUser, async (req: Request, res
  *       404:
  *         description: A video with the specified ID was not found
  */
-videoController.get(`/:id`, authService.authUser, async (req: Request, res: Response) => {
+videoController.get(`/:id`, authService.authUser.bind(authService), async (req: Request, res: Response) => {
 	const videoid: number = +req.params.id
 	const userId: number = res.locals.user?.id
 	if (!Number.isInteger(videoid)) {
@@ -176,7 +176,7 @@ videoController.get(`/:id/settings`, async (req: Request, res: Response) => {
  *       403:
  *         description: You can't get permissions of this video
  */
-videoController.get(`/:id/permissions`, authService.authUser, async (req: Request, res: Response) => {
+videoController.get(`/:id/permissions`, authService.authUser.bind(authService), async (req: Request, res: Response) => {
 	if (!res.locals.auth) {
 		return res.status(401).send(`you are not logged in`)
 	}
@@ -228,7 +228,7 @@ videoController.get(`/:id/permissions`, authService.authUser, async (req: Reques
  *       403:
  *         description: You don't have permission to update this video
  */
-videoController.patch(`/updatevideo`, authService.authUser, async (req: Request, res: Response) => {
+videoController.patch(`/updatevideo`, authService.authUser.bind(authService), async (req: Request, res: Response) => {
 	if (!res.locals.auth) {
 		return res.status(401).send(`you are not logged in`)
 	}
@@ -276,7 +276,7 @@ videoController.patch(`/updatevideo`, authService.authUser, async (req: Request,
  *       403:
  *         description: You don't have permission to update this video
  */
-videoController.delete(`/deletevideo`, authService.authUser, async (req: Request, res: Response) => {
+videoController.delete(`/deletevideo`, authService.authUser.bind(authService), async (req: Request, res: Response) => {
 	if (!res.locals.auth) {
 		return res.status(401).send(`you are not logged in`)
 	}
@@ -329,7 +329,7 @@ videoController.delete(`/deletevideo`, authService.authUser, async (req: Request
  *       422:
  *         description: permission already exists
  */
-videoController.post(`/createpermission`, authService.authUser, async (req: Request, res: Response) => {
+videoController.post(`/createpermission`, authService.authUser.bind(authService), async (req: Request, res: Response) => {
 	const userId = res.locals.id
 	if (!res.locals.auth) {
 		return res.status(401).send(`you are not logged in`)
@@ -382,7 +382,7 @@ videoController.post(`/createpermission`, authService.authUser, async (req: Requ
  *       422:
  *         description: permission already exists
  */
-videoController.delete(`/deletepermission`, authService.authUser, async (req: Request, res: Response) => {
+videoController.delete(`/deletepermission`, authService.authUser.bind(authService), async (req: Request, res: Response) => {
 	if (!res.locals.auth) {
 		return res.status(401).send(`you are not logged in`)
 	}

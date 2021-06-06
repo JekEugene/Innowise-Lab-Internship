@@ -1,8 +1,8 @@
 import { getRepository } from 'typeorm'
 import { Video } from '../videos/videos.model'
 
-export const homeService = {
-	async getVideos(isAuth: boolean, userId: number): Promise<Video[]> {
+class HomeService {
+	public async getVideos(isAuth: boolean, userId: number): Promise<Video[]> {
 		return await getRepository(Video).createQueryBuilder(`video`)
 			.leftJoin(`video.permissions`, `permission`)
 			.where(`video.type = 'READ_ALL'`)
@@ -16,3 +16,5 @@ export const homeService = {
 			.getMany()
 	}
 }
+
+export const homeService = new HomeService()

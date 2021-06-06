@@ -53,7 +53,7 @@ userController.get(`/`, async (req: Request, res: Response) => {
  *       404:
  *         description: A user with the specified ID was not found
  */
-userController.get(`/:id`, authService.authUser, async (req: Request, res: Response) => {
+userController.get(`/:id`, authService.authUser.bind(authService), async (req: Request, res: Response) => {
 	const id: number = +req.params.id
 	if (!Number.isInteger(id)) {
 		return res.status(400).send(`The specified user ID is invalid (e.g. not an integer)`)

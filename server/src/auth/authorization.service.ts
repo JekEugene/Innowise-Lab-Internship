@@ -3,12 +3,13 @@ import * as jwt from 'jsonwebtoken'
 import { Token } from './tokens.model'
 import { IUserPayload } from './user-payload.interface'
 
-export const authService = {
-	async authUser(
+class AuthService {
+	public async authUser(
 		req: Request,
 		res: Response,
 		next: NextFunction
 	): Promise<void> {
+		console.log(this)
 		if (req.cookies?.accessToken) {
 			const token = req.cookies.accessToken
 			return jwt.verify(
@@ -17,7 +18,7 @@ export const authService = {
 				async (err: Error, user: IUserPayload) => {
 					if (err) {
 						console.log(err)
-						await refreshToken(req, res)
+						await this.refreshToken(req, res)
 						return next()
 					}
 					res.locals.auth = true
@@ -28,37 +29,39 @@ export const authService = {
 		}
 
 		if (req.cookies?.refreshToken) {
-			await refreshToken(req, res)
+			await this.refreshToken(req, res)
 			return next()
 		}
 		res.locals.auth = false
 		return next()
-	},
-}
-
-async function refreshToken(req: Request, res: Response): Promise<void> {
-	if (!req.cookies?.refreshToken) {
-		res.locals.auth = false
-		return
 	}
-	const token = req.cookies.refreshToken
-	return jwt.verify(
-		token,
-		process.env.REFRESH_SECRET_TOKEN,
-		async (err: Error, user: IUserPayload) => {
-			if (err) {
-				console.log(err)
-				res.locals.auth = false
-				return
-			}
-			const userPayload: IUserPayload = {
-				id: user.id,
-				login: user.login,
-			}
-			const userToken = await Token.find({
-				where: { user_id: userPayload.id, token },
-			})
-			if (userToken) {
+	
+	private async refreshToken(req: Request, res: Response): Promise<void> {
+		if (!req.cookies?.refreshToken) {
+			res.locals.auth = false
+			return
+		}
+		const token = req.cookies.refreshToken
+		return jwt.verify(
+			token,
+			process.env.REFRESH_SECRET_TOKEN,
+			async (err: Error, user: IUserPayload) => {
+				if (err) {
+					console.log(err)
+					res.locals.auth = false
+					return
+				}
+				const userPayload: IUserPayload = {
+					id: user.id,
+					login: user.login,
+				}
+				const userToken = await Token.find({
+					where: { user_id: userPayload.id, token },
+				})
+				if (!userToken) {
+					res.locals.auth = false
+					return
+				}
 				const accessToken: string = jwt.sign(
 					userPayload,
 					process.env.ACCESS_SECRET_TOKEN,
@@ -83,10 +86,10 @@ async function refreshToken(req: Request, res: Response): Promise<void> {
 				res.locals.user = userPayload
 				res.locals.refreshToken = refreshToken
 				return
-			} else {
-				res.locals.auth = false
-				return
 			}
-		}
-	)
+		)
+	}
 }
+
+
+export const authService = new AuthService()
