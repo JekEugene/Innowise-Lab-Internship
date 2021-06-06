@@ -4,6 +4,7 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import path from 'path'
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function middleware(app: Express, express): void {
 	app.use(express.json())
 
@@ -20,7 +21,7 @@ export function middleware(app: Express, express): void {
 
 	const storageConfig = multer.diskStorage({
 		destination: (req: Request, file: Express.Multer.File, cb) =>{
-			cb(null, `videos`)
+			cb(null, `../client/static/videos`)
 		},
 		filename: (req: Request, file: Express.Multer.File, cb) => {
 			req.body.link = `VIDEO-` + Date.now() + path.extname(file.originalname)

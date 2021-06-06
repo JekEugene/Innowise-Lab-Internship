@@ -54,6 +54,18 @@ videoController.patch(`/updatevideo`, authService.authUser, async (req: Request,
 	return res.status(200).send(`video updated`)
 })
 
+videoController.delete(`/deletevideo`, authService.authUser, async (req: Request, res: Response) => {
+	if (!res.locals.auth) {
+		return res.status(401).send(`you are not logged in`)
+	}
+	const validate: boolean = await videoService.validateDeleteVideo(res.locals.user.id, req.body.id)
+	if (!validate) {
+		return res.status(401).send(`validate error`)
+	}
+	videoService.deleteVideo(req.body.id)
+	return res.status(200).send(`video deleted`)
+})
+
 videoController.post(`/createpermission`, authService.authUser, async (req: Request, res: Response) => {
 	if (!res.locals.auth) {
 		return res.status(401).send(`you are not logged in`)

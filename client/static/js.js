@@ -271,6 +271,8 @@ class VideoSettings extends AbstractView {
 						<input class="id" type="hidden" name="id" value="${video.id}">
 						<button type="submit">update</button>
 					</form>
+					<h3>delete video:</h3>
+					<button onclick="deleteVideo(${video.id})">delete video</button>
 					<h3>give permission</h3>
 					<form class="createpermission" onsubmit="createpermission(); return false">
 					<input required class="user_id" type="number" name="user_id" placeholder="user id">

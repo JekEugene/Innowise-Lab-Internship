@@ -22,6 +22,27 @@ export const videoService = {
 		const video: Video = await Video.findOne(videoId)
 		return video.user_id === userId ? true : false
 	},
+	
+	async validateDeleteVideo(userId: number, videoId: number): Promise<boolean> {
+		const video: Video = await getRepository(Video).findOne(videoId, {
+			relations: [`permissions`]
+		})
+		if (video.user_id === userId) {
+			return true
+		}
+		return video.permissions.some(permission => {
+			if (permission.user_id === userId && permission.type === `ADMIN`) {
+				return true
+			} else {
+				return false
+			}
+		})
+	},
+
+	async deleteVideo(id: number): Promise<void> {
+		Permission.delete({ video_id: id })
+		Video.delete(id)
+	},
 
 	async getVideoPermissions(videoId: number): Promise<Permission[]> {
 		const permission: Permission[] = await Permission.find({ where: {video_id: videoId}})
@@ -63,5 +84,4 @@ export const videoService = {
 			}
 		})
 	}
-	
 }
