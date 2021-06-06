@@ -78,7 +78,7 @@ videoController.get(`/:id`, authService.authUser.bind(authService), async (req: 
 	if (!Number.isInteger(videoid)) {
 		return res.status(400).send(`The specified video ID is invalid (e.g. not an integer)`)
 	}
-	const video: Video = await videoService.getVideo(+req.params.id)
+	const video: Video = await videoService.getVideo(videoid)
 	if (!video) {
 		return res.status(404).send(`A video with the specified ID was not found`)
 	}
@@ -119,7 +119,7 @@ videoController.get(`/:id/settings`, async (req: Request, res: Response) => {
 	if (!isUserHavePermission) {
 		return res.status(403).send(`you can't get permission of this video`)
 	}
-	const video: Video = await videoService.getVideo(+req.params.id)
+	const video: Video = await videoService.getVideo(videoId)
 	return res.status(200).json(video)
 })
 
@@ -241,12 +241,13 @@ videoController.delete(`/deletevideo`, authService.authUser.bind(authService), a
 	if (!res.locals.auth) {
 		return res.status(401).send(`you are not logged in`)
 	}
-	const { id } = req.body
-	const isUserHavePermission: boolean = await videoService.validateIsUserHavePermission(res.locals.user.id, id)
+	const videoId: number = req.body.id
+	const userId: number = res.locals.user.id
+	const isUserHavePermission: boolean = await videoService.validateIsUserHavePermission(userId, videoId)
 	if (!isUserHavePermission) {
 		return res.status(403).send(`you don't have permission to delete this video`)
 	}
-	videoService.deleteVideo(id)
+	videoService.deleteVideo(videoId)
 	return res.status(200).send(`video deleted`)
 })
 
