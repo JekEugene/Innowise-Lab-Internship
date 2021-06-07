@@ -1,7 +1,10 @@
+
 import { ICreateVideoDto } from './dto/create-video.dto'
 import { IUpdateVideoDto } from './dto/update-video.dto'
 import { Permission } from './permissions.model'
 import { Video } from './videos.model'
+import fs from 'fs'
+import { logger } from '../middleware/logger'
 class VideoService {
 	public async createVideo(newVideo: ICreateVideoDto): Promise<void> {
 		Video.create(newVideo).save()
@@ -77,6 +80,23 @@ class VideoService {
 			return true
 		else
 			return false
+	}
+
+	public async deleteVideoFile<T>(arg: T): Promise<void> {
+		if (typeof arg === `string`) {
+			const link: string = arg
+			fs.unlink(`../client/video/${link}`, (err) => {
+				logger.error(``, err)
+			})
+			return
+		}
+		if (typeof arg === `number`) {
+			const videoId: number = arg
+			const video: Video = await Video.findOne(videoId)
+			fs.unlink(`../client/video/${video.link}`, (err) => {
+				logger.error(``, err)
+			})
+		}
 	}
 }
 

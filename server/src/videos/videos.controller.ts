@@ -44,10 +44,13 @@ videoController.post(`/newvideo`, authService.authUser.bind(authService), async 
 	const filedata = req.file
 	const validateVideoType: boolean = await videoService.validateVideoType(type)
 	if (!validateVideoType) {
+		videoService.deleteVideoFile(link)
 		return res.status(400).send(`incorrect video type`)
 	}
-	if(!filedata)
+	if (!filedata) {
+		videoService.deleteVideoFile(link)
 		return res.status(400).send(`Error uploading file`)
+	}
 	const newVideo: ICreateVideoDto = {
 		name,
 		link,
@@ -255,6 +258,7 @@ videoController.delete(`/deletevideo`, authService.authUser.bind(authService), a
 	if (!isUserHavePermission) {
 		return res.status(403).send(`you don't have permission to delete this video`)
 	}
+	videoService.deleteVideoFile(videoId)
 	videoService.deleteVideo(videoId)
 	return res.status(200).send(`video deleted`)
 })
