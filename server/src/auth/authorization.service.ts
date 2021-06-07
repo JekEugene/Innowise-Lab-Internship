@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import * as jwt from 'jsonwebtoken'
+import { logger } from '../middleware/logger'
 import { Token } from './tokens.model'
 import { IUserPayload } from './user-payload.interface'
 
@@ -17,7 +18,7 @@ class AuthService {
 				process.env.ACCESS_SECRET_TOKEN,
 				async (err: Error, user: IUserPayload) => {
 					if (err) {
-						console.log(err)
+						logger.error(``, err)
 						await this.refreshToken(req, res)
 						return next()
 					}
@@ -47,7 +48,7 @@ class AuthService {
 			process.env.REFRESH_SECRET_TOKEN,
 			async (err: Error, user: IUserPayload) => {
 				if (err) {
-					console.log(err)
+					logger.error(``, err)
 					res.locals.auth = false
 					return
 				}
