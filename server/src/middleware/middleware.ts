@@ -32,6 +32,7 @@ export function middleware(app: Express, express): void {
 	})
 	
 	const fileFilter = (req: Request, file: Express.Multer.File, cb) => {
+		console.log(`hi`)
 		const videoTypes = [`video/mpeg`, `video/mp4`, `video/ogg`, `video/quicktime`,
 			`video/webm`, `video/x-ms-wmv`, `video/x-flv`, `video/x-msvideo`, `video/3gpp`, `video/3gpp2`]
 		if(videoTypes.includes(file.mimetype)){

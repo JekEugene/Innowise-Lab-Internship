@@ -17,20 +17,18 @@ import { videoService } from './videos.service'
  *     summary: create new video
  *     tags:
  *     - videos
+ *     consumes:
+ *     - multipart/form-data
  *     parameters:
- *     - in: body
- *       name: video
- *       schema:
- *         type: object
- *         required:
- *         - name
- *         - type
- *         properties:
- *           name:
- *             type: string
- *           type:
- *             type: string
- *     - in: file
+ *     - in: formData
+ *       name: name
+ *       type: string
+ *       required: true
+ *     - in: formData
+ *       name: type
+ *       type: string
+ *       required: true
+ *     - in: formData
  *       name: filedata
  *       type: file
  *       required: true
@@ -43,12 +41,12 @@ import { videoService } from './videos.service'
 videoController.post(`/newvideo`, authService.authUser.bind(authService), async (req: Request, res: Response) => {
 	const { name, link, type } = req.body
 	const user_id = res.locals.user.id
-	const filedata = req.file
 	const validateVideoType: boolean = await videoService.validateVideoType(type)
 	if (!validateVideoType) {
 		videoService.deleteVideoFile(link)
 		return res.status(400).send(`incorrect video type`)
 	}
+	const filedata = req.file
 	if (!filedata) {
 		videoService.deleteVideoFile(link)
 		return res.status(400).send(`Error uploading file`)
