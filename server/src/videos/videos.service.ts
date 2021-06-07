@@ -70,6 +70,14 @@ class VideoService {
 			return false
 		}
 	}
+	
+	public async validateVideoType(type: string): Promise<boolean> {
+		const videoTypes: string[] = [`READ_ADD`, `READ_AUTH`, `READ_CHOSEN`, `READ_ADMIN`]
+		if(videoTypes.includes(type))
+			return true
+		else
+			return false
+	}
 }
 
 export const videoService = new VideoService()

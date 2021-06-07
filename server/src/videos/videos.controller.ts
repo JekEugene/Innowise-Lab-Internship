@@ -25,28 +25,27 @@ import { videoService } from './videos.service'
  *       type: string
  *       required: true
  *     - in: body
- *       name: link
- *       type: string
- *       required: true
- *     - in: body
  *       name: type
  *       type: string
  *       required: true
- *     - in: body
+ *     - in: file
  *       name: filedata
- *       type: string
- *       format: binary
+ *       type: file
  *       required: true
  *     responses:
  *       200:
  *         description: Success
  *       400:
- *         description: Error uploading file
+ *         description: Validate error
  */
 videoController.post(`/newvideo`, authService.authUser.bind(authService), async (req: Request, res: Response) => {
 	const { name, link, type } = req.body
 	const user_id = res.locals.user.id
 	const filedata = req.file
+	const validateVideoType: boolean = await videoService.validateVideoType(type)
+	if (!validateVideoType) {
+		return res.status(400).send(`incorrect video type`)
+	}
 	if(!filedata)
 		return res.status(400).send(`Error uploading file`)
 	const newVideo: ICreateVideoDto = {
@@ -74,8 +73,12 @@ videoController.post(`/newvideo`, authService.authUser.bind(authService), async 
  *     responses:
  *       200:
  *         description: Success
+ *       400:
+ *         description: The specified video ID is invalid (e.g. not an integer)
  *       404:
  *         description: A video with the specified ID was not found
+ *       403:
+ *         description: You don't have permission to watch this video
  */
 videoController.get(`/:id`, authService.authUser.bind(authService), async (req: Request, res: Response) => {
 	const videoid: number = +req.params.id
