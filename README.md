@@ -23,6 +23,10 @@ npm install
 npm run start
 ```
 
-# entity schemes
+# Api documentation
+
+navigate to `http://localhost:{PORT}/api-docs`
+
+# Entity schemes
 
 view [entity schemes](https://drawsql.app/jek/diagrams/video1)
