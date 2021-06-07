@@ -100,8 +100,8 @@ authController.post(`/login`, async (req: Request, res: Response) => {
 		httpOnly: true,
 		path: `/`,
 	})
-	res.cookie(`id`, user.id, { path: `/` })
-	res.cookie(`login`, user.login, { path: `/` })
+	res.cookie(`login`, user.login, {maxAge: 1000 * 60 * 60 * 24 * 7})
+	res.cookie(`id`, user.id, {maxAge: 1000 * 60 * 60 * 24 * 7})
 	return res.redirect(200, `/`)
 })
 

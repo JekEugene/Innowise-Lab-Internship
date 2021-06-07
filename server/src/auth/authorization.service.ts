@@ -10,7 +10,6 @@ class AuthService {
 		res: Response,
 		next: NextFunction
 	): Promise<void> {
-		console.log(this)
 		if (req.cookies?.accessToken) {
 			const token = req.cookies.accessToken
 			return jwt.verify(
@@ -83,6 +82,8 @@ class AuthService {
 					maxAge: 1000 * 60 * 60 * 24 * 7,
 					httpOnly: true,
 				})
+				res.cookie(`login`, user.login, {maxAge: 1000 * 60 * 60 * 24 * 7})
+				res.cookie(`id`, user.id, {maxAge: 1000 * 60 * 60 * 24 * 7})
 				res.locals.auth = true
 				res.locals.user = userPayload
 				res.locals.refreshToken = refreshToken

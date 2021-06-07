@@ -32,6 +32,11 @@ import { videoService } from './videos.service'
  *       name: type
  *       type: string
  *       required: true
+ *     - in: body
+ *       name: filedata
+ *       type: string
+ *       format: binary
+ *       required: true
  *     responses:
  *       200:
  *         description: Success
