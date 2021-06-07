@@ -316,7 +316,7 @@ videoController.post(`/createpermission`, authService.authUser.bind(authService)
 	}
 	const newPermission: ICreatePermissionDto = req.body
 
-	const isUserHavePermission: boolean = await videoService.validateIsUserHavePermission(userId, newPermission.video_id)
+	const isUserHavePermission: boolean = await videoService.validateIsUserHavePermission(userId, newPermission.videoId)
 	if (!isUserHavePermission) {
 		res.status(403).send(`you don't have permissions of this video`)
 	}
