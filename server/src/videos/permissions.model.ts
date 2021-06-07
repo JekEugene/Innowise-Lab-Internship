@@ -15,19 +15,19 @@ export class Permission extends BaseEntity {
 	id: number
 
 	@Column(`int`)
-	user_id: number
+	userId: number
 
 	@Column(`int`)
-	video_id: number
+	videoId: number
 	
 	@Column(`varchar`)
 	type: string
 
 	@ManyToOne(()=>User, user => user.videos)
-	@JoinColumn({ name: `user_id` })
+	@JoinColumn({ name: `userId` })
 	user: User
 
 	@ManyToOne(()=>Video, video => video.permissions)
-	@JoinColumn({ name: `video_id` })
+	@JoinColumn({ name: `videoId` })
 	video: Video
 }

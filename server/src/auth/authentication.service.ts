@@ -23,8 +23,8 @@ export const authenticationService = {
 		return await bcrypt.compare(password, user.password)
 	},
 
-	async createRefreshToken(user_id: number, token: string): Promise<Token> {
-		return await Token.create({ token, user_id }).save()
+	async createRefreshToken(userId: number, token: string): Promise<Token> {
+		return await Token.create({ token, userId }).save()
 	},
 
 	signAccessToken(userPayload: IUserPayload): string {
@@ -39,7 +39,7 @@ export const authenticationService = {
 	},
 
 	deleteToken(token: string, userId: number): Promise<void> {
-		Token.delete({ user_id: userId, token })
+		Token.delete({ userId, token })
 		return
 	},
 }

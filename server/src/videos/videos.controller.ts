@@ -40,7 +40,7 @@ import { videoService } from './videos.service'
  */
 videoController.post(`/newvideo`, authService.authUser.bind(authService), async (req: Request, res: Response) => {
 	const { name, link, type } = req.body
-	const user_id = res.locals.user.id
+	const userId = res.locals.user.id
 	const validateVideoType: boolean = await videoService.validateVideoType(type)
 	if (!validateVideoType) {
 		videoService.deleteVideoFile(link)
@@ -55,7 +55,7 @@ videoController.post(`/newvideo`, authService.authUser.bind(authService), async 
 		name,
 		link,
 		type,
-		user_id
+		userId
 	}
 	videoService.createVideo(newVideo)
 	return res.status(200).send(`file uploaded`)

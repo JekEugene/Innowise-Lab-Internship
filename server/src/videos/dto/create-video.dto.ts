@@ -1,6 +1,9 @@
-export interface ICreateVideoDto {
+import { DeepPartial } from 'typeorm'
+import { Video } from '../videos.model'
+
+export interface ICreateVideoDto extends DeepPartial<Video> {
   name: string,
   link: string,
-  user_id: number,
+  userId: number,
   type: string
 }

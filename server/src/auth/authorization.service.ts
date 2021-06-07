@@ -72,8 +72,8 @@ class AuthService {
 					process.env.REFRESH_SECRET_TOKEN,
 					{ expiresIn: `7d` }
 				)
-				Token.delete({ user_id: userPayload.id, token })
-				Token.create({ user_id: userPayload.id, token: refreshToken })
+				Token.delete({ userId: userPayload.id, token })
+				Token.create({ userId: userPayload.id, token: refreshToken })
 				res.cookie(`accessToken`, accessToken, {
 					maxAge: 1000 * 10,
 					httpOnly: true,

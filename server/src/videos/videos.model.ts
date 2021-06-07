@@ -15,7 +15,7 @@ export class Video extends BaseEntity {
 	id: number
 
 	@Column(`int`)
-	user_id: number
+	userId: number
 
 	@Column(`varchar`)
 	name: string
@@ -27,7 +27,7 @@ export class Video extends BaseEntity {
 	link: string
 
 	@ManyToOne(()=>User, user => user.videos)
-	@JoinColumn({ name: `user_id` })
+	@JoinColumn({ name: `userId` })
 	user: User
 
 	@OneToMany(() => Permission, permission => permission.video)

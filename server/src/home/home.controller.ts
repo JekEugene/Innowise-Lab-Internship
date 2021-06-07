@@ -29,7 +29,7 @@ homeController.get(
 					id: video.id,
 					name: video.name,
 					link: video.link,
-					user_id: video.user_id,
+					user_id: video.userId,
 				}
 			})
 			res.status(200).json(sendVideos)

@@ -14,12 +14,12 @@ export class Token extends BaseEntity {
 	id: number
 
   @Column(`int`)
-	user_id: number
+	userId: number
 
 	@Column(`varchar`)
 	token: string
 	
 	@ManyToOne(()=>User, user => user.tokens)
-	@JoinColumn({ name: `user_id` })
+	@JoinColumn({ name: `userId` })
 	user: User
 }

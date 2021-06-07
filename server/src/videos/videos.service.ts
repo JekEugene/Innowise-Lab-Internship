@@ -20,22 +20,22 @@ class VideoService {
 	
 	public async validateUpdate(userId: number, videoId: number): Promise<boolean> {
 		const video: Video = await Video.findOne(videoId)
-		return video.user_id === userId ? true : false
+		return video.userId === userId ? true : false
 	}
 
 	public async deleteVideo(id: number): Promise<void> {
-		Permission.delete({ video_id: id })
+		Permission.delete({ videoId: id })
 		Video.delete(id)
 	}
 	
 	public async validateIsUserHavePermission(userId: number, videoId: number): Promise<boolean> {
 		const video: Video = await Video.findOne(videoId, {relations: [`permissions`]})
 		
-		if (video.user_id === userId) {
+		if (video.userId === userId) {
 			return true
 		}
 		return video.permissions.some(permission => {
-			if (permission.user_id === userId && permission.type === `ADMIN`) {
+			if (permission.userId === userId && permission.type === `ADMIN`) {
 				return true
 			} else {
 				return false
@@ -45,7 +45,7 @@ class VideoService {
 
 	public async validateIsUserCanWatch(userId: number, videoId: number): Promise<boolean> {
 		const video: Video = await Video.findOne(videoId, { relations: [`permissions`] })
-		if (video.user_id === userId) {
+		if (video.userId === userId) {
 			return true
 		}
 		switch (video.type) {
@@ -55,7 +55,7 @@ class VideoService {
 			return userId ? true : false
 		case `READ_CHOSEN`:
 			return video.permissions.some(permission => {
-				if (permission.user_id === userId) {
+				if (permission.userId === userId) {
 					return true
 				} else {
 					return false
@@ -63,7 +63,7 @@ class VideoService {
 			})
 		case `READ_ADMIN`:
 			return video.permissions.some(permission => {
-				if (permission.user_id === userId && permission.type === `ADMIN`) {
+				if (permission.userId === userId && permission.type === `ADMIN`) {
 					return true
 				} else {
 					return false
