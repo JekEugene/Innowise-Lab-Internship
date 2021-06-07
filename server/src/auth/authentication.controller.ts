@@ -17,13 +17,17 @@ import { logger } from '../middleware/logger'
  *     - auth
  *     parameters:
  *     - in: body
- *       name: login
- *       type: string
- *       required: true
- *     - in: body
- *       name: password
- *       type: string
- *       required: true
+ *       name: registration
+ *       schema:
+ *         type: object
+ *         required:
+ *         - login
+ *         - password
+ *         properties:
+ *           login:
+ *             type: string
+ *           password:
+ *             type: string
  *     responses:
  *       200:
  *         description: Success
@@ -60,13 +64,17 @@ authController.post(`/register`, async (req: Request, res: Response) => {
  *     - auth
  *     parameters:
  *     - in: body
- *       name: login
- *       type: string
- *       required: true
- *     - in: body
- *       name: password
- *       type: string
- *       required: true
+ *       name: registration
+ *       schema:
+ *         type: object
+ *         required:
+ *         - login
+ *         - password
+ *         properties:
+ *           login:
+ *             type: string
+ *           password:
+ *             type: string
  *     responses:
  *       200:
  *         description: Success

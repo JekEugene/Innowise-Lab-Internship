@@ -14,20 +14,22 @@ import { videoService } from './videos.service'
  * @swagger
  * /videos/newvideo:
  *   post:
- *     consumes:
- *     - application/json
  *     summary: create new video
  *     tags:
  *     - videos
  *     parameters:
  *     - in: body
- *       name: name
- *       type: string
- *       required: true
- *     - in: body
- *       name: type
- *       type: string
- *       required: true
+ *       name: video
+ *       schema:
+ *         type: object
+ *         required:
+ *         - name
+ *         - type
+ *         properties:
+ *           name:
+ *             type: string
+ *           type:
+ *             type: string
  *     - in: file
  *       name: filedata
  *       type: file
@@ -145,17 +147,20 @@ videoController.get(`/:id/settings`, async (req: Request, res: Response) => {
  *     - videos
  *     parameters:
  *     - in: body
- *       name: name
- *       type: string
- *       required: true
- *     - in: body
- *       name: link
- *       type: string
- *       required: true
- *     - in: body
- *       name: type
- *       type: string
- *       required: true
+ *       name: video
+ *       schema:
+ *         type: object
+ *         required:
+ *         - name
+ *         - link
+ *         - type
+ *         properties:
+ *           name:
+ *             type: string
+ *           link:
+ *             type: string
+ *           type:
+ *             type: string
  *     responses:
  *       200:
  *         description: Success
@@ -189,17 +194,20 @@ videoController.get(`/:id/permissions`, authService.authUser.bind(authService), 
  *     - videos
  *     parameters:
  *     - in: body
- *       name: id
- *       type: number
- *       required: true
- *     - in: body
- *       name: name
- *       type: string
- *       required: true
- *     - in: body
- *       name: type
- *       type: string
- *       required: true
+ *       name: video update
+ *       schema:
+ *         type: object
+ *         required:
+ *         - name
+ *         - link
+ *         - type
+ *         properties:
+ *           name:
+ *             type: string
+ *           link:
+ *             type: string
+ *           type:
+ *             type: string
  *     responses:
  *       200:
  *         description: Success
@@ -237,9 +245,14 @@ videoController.patch(`/updatevideo`, authService.authUser.bind(authService), as
  *     - videos
  *     parameters:
  *     - in: body
- *       name: id
- *       type: number
- *       required: true
+ *       name: video id
+ *       schema:
+ *         type: object
+ *         required:
+ *         - id
+ *         properties:
+ *           id:
+ *             type: number
  *     responses:
  *       200:
  *         description: Success
@@ -274,17 +287,20 @@ videoController.delete(`/deletevideo`, authService.authUser.bind(authService), a
  *     - videos
  *     parameters:
  *     - in: body
- *       name: id
- *       type: number
- *       required: true
- *     - in: body
- *       name: name
- *       type: string
- *       required: true
- *     - in: body
- *       name: type
- *       type: string
- *       required: true
+ *       name: permission
+ *       schema:
+ *         type: object
+ *         required:
+ *         - user_id
+ *         - video_id
+ *         - type
+ *         properties:
+ *           user_id:
+ *             type: number
+ *           video_id:
+ *             type: number
+ *           type:
+ *             type: string
  *     responses:
  *       200:
  *         description: Success
@@ -327,9 +343,14 @@ videoController.post(`/createpermission`, authService.authUser.bind(authService)
  *     - videos
  *     parameters:
  *     - in: body
- *       name: id
- *       type: number
- *       required: true
+ *       name: video id
+ *       schema:
+ *         type: object
+ *         required:
+ *         - id
+ *         properties:
+ *           id:
+ *             type: number
  *     responses:
  *       200:
  *         description: Success
