@@ -4,7 +4,7 @@
   "description": "",
   "main": "./dist/app.js",
   "scripts": {
-    "start": "npm run build && node dist/app.js",
+    "start": "npm run build && ts-node ./app.ts",
     "dev": "npm run build && nodemon ./app.ts",
     "build": "tsc -p .",
     "precommit": "lint-staged"
