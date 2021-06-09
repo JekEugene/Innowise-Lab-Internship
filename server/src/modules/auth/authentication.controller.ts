@@ -5,6 +5,8 @@ const authController = Router()
 import { authenticationService } from './authentication.service'
 import { authService } from './authorization.service'
 import { logger } from '../../middleware/logger'
+import { userRepository } from '../user/user.repository'
+import { tokenRepository } from './token.repository'
 
 /**
  * @swagger
@@ -37,7 +39,7 @@ import { logger } from '../../middleware/logger'
 authController.post(`/register`, async (req: Request, res: Response) => {
 	try {
 		const { login, password } = req.body
-		const user = await authenticationService.findUser(login)
+		const user = await userRepository.getUserByLogin(login)
 		if (user) {
 			return res.status(422).send(`user already exists`)
 		}
@@ -46,7 +48,7 @@ authController.post(`/register`, async (req: Request, res: Response) => {
 			login,
 			password: hashPassword,
 		}
-		authenticationService.createUser(newUser)
+		userRepository.createUser(newUser)
 		return res.redirect(201, `/login`)
 	} catch (err) {
 		logger.error(``, err)
@@ -84,7 +86,7 @@ authController.post(`/register`, async (req: Request, res: Response) => {
 authController.post(`/login`, async (req: Request, res: Response) => {
 	try {
 		const { login, password } = req.body
-		const user = await authenticationService.findUser(login)
+		const user = await userRepository.getUserByLogin(login)
 		if (!user) {
 			return res.status(401).send(`Login or password incorrect`)
 		}
@@ -100,7 +102,7 @@ authController.post(`/login`, async (req: Request, res: Response) => {
 		}
 
 		const refreshToken = authenticationService.signRefreshToken(userPayload)
-		authenticationService.createRefreshToken(user.id, refreshToken)
+		tokenRepository.createToken(user.id, refreshToken)
 		const accessToken = authenticationService.signAccessToken(userPayload)
 
 		res.cookie(`accessToken`, accessToken, {
@@ -143,7 +145,7 @@ authController.get(
 			if (!res.locals.auth) {
 				return res.status(401).send(`you are not logged in`)
 			}
-			authenticationService.deleteToken(
+			tokenRepository.deleteToken(
 				res.locals.refreshToken,
 				res.locals.user.id
 			)

@@ -1,7 +1,9 @@
 import { Router, Request, Response } from 'express'
 import { authService } from '../auth/authorization.service'
 import { Video } from '../video/video.model'
+import { videoRepository } from '../video/video.repository'
 import { User } from './user.model'
+import { userRepository } from './user.repository'
 const userController = Router()
 
 import { userService } from './user.service'
@@ -18,7 +20,7 @@ import { userService } from './user.service'
  *         description: Success
  */
 userController.get(`/`, async (req: Request, res: Response) => {
-	const users: User[] = await userService.getAllUsers()
+	const users: User[] = await userRepository.getAllUsers()
 	const sendUsers = users.map(user => {
 		return {id: user.id, login: user.login}
 	})
@@ -55,7 +57,7 @@ userController.get(`/:id`, authService.authUser.bind(authService), async (req: R
 	if (!isUserExist) {
 		return res.status(404).send(`A user with the specified ID was not found`)
 	}
-	const videos: Video[] = await userService.getUserVideos(res.locals.auth, userId, reqUserId)
+	const videos: Video[] = await videoRepository.getAllUserVideos(res.locals.auth, userId, reqUserId)
 	const sendVideos = videos.map(video => {
 		return { id: video.id, name: video.name, link: video.link, user_id: video.user_id }
 	})

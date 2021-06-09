@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import * as jwt from 'jsonwebtoken'
 import { logger } from '../../middleware/logger'
-import { Token } from './token.model'
+import { tokenRepository } from './token.repository'
 import { IUserPayload } from './user-payload.interface'
 
 class AuthService {
@@ -55,9 +55,7 @@ class AuthService {
 					id: user.id,
 					login: user.login,
 				}
-				const userToken = await Token.find({
-					where: { user_id: userPayload.id, token },
-				})
+				const userToken = tokenRepository.getToken(userPayload.id, token)
 				if (!userToken) {
 					res.locals.auth = false
 					return
@@ -72,8 +70,8 @@ class AuthService {
 					process.env.REFRESH_SECRET_TOKEN,
 					{ expiresIn: `7d` }
 				)
-				Token.delete({ user_id: userPayload.id, token })
-				Token.create({ user_id: userPayload.id, token: refreshToken })
+				tokenRepository.deleteToken(userPayload.id, token)
+				tokenRepository.createToken(userPayload.id, refreshToken)
 				res.cookie(`accessToken`, accessToken, {
 					maxAge: 1000 * 10,
 					httpOnly: true,
