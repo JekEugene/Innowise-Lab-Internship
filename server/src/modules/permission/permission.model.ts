@@ -7,7 +7,7 @@ import {
 	JoinColumn,
 } from 'typeorm'
 import { User } from '../user/user.model'
-import { Video } from './video.model'
+import { Video } from '../video/video.model'
 
 @Entity()
 export class Permission extends BaseEntity {

@@ -1,7 +1,7 @@
 import { Brackets, getRepository } from 'typeorm'
 import { ICreateVideoDto } from './dto/create-video.dto'
 import { IUpdateVideoDto } from './dto/update-video.dto'
-import { Permission } from './permission.model'
+import { Permission } from '../permission/permission.model'
 import { Video } from './video.model'
 
 class VideoRepository {
