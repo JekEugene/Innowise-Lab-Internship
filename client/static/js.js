@@ -12,14 +12,14 @@ class AbstractView {
 	}
 }
 
-class Home extends AbstractView {
+class Videos extends AbstractView {
 	constructor(params) {
 		super(params);
 		this.setTitle('Home');
 	}
 
 	async getHtml() {
-		let response = await fetch(`http://localhost:4000/`, {
+		let response = await fetch(`http://localhost:4000/videos`, {
 			method: `get`,
 			credentials: 'include',
 		});
@@ -35,6 +35,17 @@ class Home extends AbstractView {
 		});
 
 		return res.join('');
+	}
+}
+
+class Home extends AbstractView {
+	constructor(params) {
+		super(params);
+		this.setTitle('Home');
+	}
+
+	async getHtml() {
+		navigateTo('/videos')
 	}
 }
 
@@ -158,7 +169,7 @@ class Users extends AbstractView {
 	}
 }
 
-class Videos extends AbstractView {
+class Video extends AbstractView {
 	constructor(params) {
 		super(params);
 		this.setTitle('Video');
@@ -329,8 +340,9 @@ const router = async () => {
 		{ path: '/', view: Home },
 		{ path: '/users', view: AllUsers },
 		{ path: '/users/:id', view: Users },
+		{ path: '/videos', view: Videos },
 		{ path: '/videos/newvideo', view: NewVideo },
-		{ path: '/videos/:id', view: Videos },
+		{ path: '/videos/:id', view: Video },
 		{ path: '/settings/:id', view: VideoSettings },
 		{ path: '/register', view: Register },
 		{ path: '/login', view: Login },

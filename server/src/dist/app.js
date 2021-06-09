@@ -44,15 +44,14 @@ var ormconfig_1 = require("../ormconfig");
 var middleware_1 = require("./middleware/middleware");
 var app = express_1["default"]();
 var user_controller_1 = require("./modules/user/user.controller");
-var home_controller_1 = require("./modules/home/home.controller");
 var authentication_controller_1 = require("./modules/auth/authentication.controller");
 var video_controller_1 = require("./modules/video/video.controller");
 var PORT = process.env.PORT || 4000;
 middleware_1.middleware(app, express_1["default"]);
-app.use("/", home_controller_1["default"]);
 app.use("/users", user_controller_1["default"]);
 app.use("/auth", authentication_controller_1["default"]);
 app.use("/videos", video_controller_1["default"]);
+app.use("/", function (req, res) { res.redirect(303, "/videos"); });
 function start() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
