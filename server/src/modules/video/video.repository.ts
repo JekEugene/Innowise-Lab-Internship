@@ -14,7 +14,7 @@ class VideoRepository {
 	}
 	
 	public async getVideoWithPermissions(videoId: number) {
-		return await Video.findOne(videoId, {relations: [`permissios`]})
+		return await Video.findOne(videoId, {relations: [`permissions`]})
 	}
 
 	public async getAllVideos(isAuth: boolean, userId: number) {
