@@ -6,6 +6,7 @@ import { IUpdateVideoDto } from './dto/update-video.dto'
 import { Permission } from './permission.model'
 import { permissionService } from './permission.service'
 import { Video } from './video.model'
+import { videoRepository } from './video.repository'
 const videoController = Router()
 
 import { videoService } from './video.service'
@@ -57,7 +58,7 @@ videoController.post(`/newvideo`, authService.authUser.bind(authService), async 
 		type,
 		userId
 	}
-	videoService.createVideo(newVideo)
+	videoRepository.createVideo(newVideo)
 	return res.status(200).send(`file uploaded`)
 })
 
@@ -89,7 +90,7 @@ videoController.get(`/:id`, authService.authUser.bind(authService), async (req: 
 	if (!Number.isInteger(videoId)) {
 		return res.status(400).send(`The specified video ID is invalid (e.g. not an integer)`)
 	}
-	const video: Video = await videoService.getVideo(videoId)
+	const video: Video = await videoRepository.getVideo(videoId)
 	if (!video) {
 		return res.status(404).send(`A video with the specified ID was not found`)
 	}
@@ -130,7 +131,7 @@ videoController.get(`/:id/settings`, authService.authUser.bind(authService), asy
 	if (!isUserHavePermission) {
 		return res.status(403).send(`you can't get permission of this video`)
 	}
-	const video: Video = await videoService.getVideo(videoId)
+	const video: Video = await videoRepository.getVideo(videoId)
 	return res.status(200).json(video)
 })
 
@@ -228,7 +229,7 @@ videoController.patch(`/updatevideo`, authService.authUser.bind(authService), as
 	if(!isUserHavePermission){
 		return res.status(403).send(`you don't have permission to update this video`)
 	}
-	videoService.updateVideo(videoId, updateVideo)
+	videoRepository.updateVideo(videoId, updateVideo)
 	return res.status(200).send(`video updated`)
 })
 
@@ -270,7 +271,7 @@ videoController.delete(`/deletevideo`, authService.authUser.bind(authService), a
 		return res.status(403).send(`you don't have permission to delete this video`)
 	}
 	videoService.deleteVideoFile(videoId)
-	videoService.deleteVideo(videoId)
+	videoRepository.deleteVideo(videoId)
 	return res.status(200).send(`video deleted`)
 })
 

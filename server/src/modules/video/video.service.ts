@@ -1,35 +1,16 @@
 
-import { ICreateVideoDto } from './dto/create-video.dto'
-import { IUpdateVideoDto } from './dto/update-video.dto'
-import { Permission } from './permission.model'
 import { Video } from './video.model'
 import fs from 'fs'
 import { logger } from '../../middleware/logger'
+import { videoRepository } from './video.repository'
 class VideoService {
-	public async createVideo(createVideo: ICreateVideoDto): Promise<void> {
-		Video.create({...createVideo, user_id: createVideo.userId}).save()
-	}
-
-	public async getVideo(id: number): Promise<Video> {
-		return await Video.findOne(id)
-	}
-
-	public async updateVideo(id: number, updateVideo: IUpdateVideoDto): Promise<void> {
-		await Video.update({ id },{ ...updateVideo })
-	}
-	
 	public async validateUpdate(userId: number, videoId: number): Promise<boolean> {
-		const video: Video = await Video.findOne(videoId)
+		const video: Video = await videoRepository.getVideo(videoId)
 		return video.user_id === userId ? true : false
-	}
-
-	public async deleteVideo(id: number): Promise<void> {
-		Permission.delete({ video_id: id })
-		Video.delete(id)
 	}
 	
 	public async validateIsUserHavePermission(userId: number, videoId: number): Promise<boolean> {
-		const video: Video = await Video.findOne(videoId, {relations: [`permissions`]})
+		const video: Video = await videoRepository.getVideoWithPermissions(videoId)
 		if (video.user_id === userId) {
 			return true
 		}
@@ -43,7 +24,7 @@ class VideoService {
 	}
 
 	public async validateIsUserCanWatch(userId: number, videoId: number): Promise<boolean> {
-		const video: Video = await Video.findOne(videoId, { relations: [`permissions`] })
+		const video: Video = await videoRepository.getVideoWithPermissions(videoId)
 		if (video.user_id === userId) {
 			return true
 		}
@@ -91,7 +72,7 @@ class VideoService {
 		}
 		if (typeof arg === `number`) {
 			const videoId: number = arg
-			const video: Video = await Video.findOne(videoId)
+			const video: Video = await videoRepository.getVideo(videoId)
 			fs.unlink(`../client/video/${video.link}`, (err) => {
 				logger.error(``, err)
 			})
