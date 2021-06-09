@@ -6,9 +6,9 @@ import {
 	OneToMany,
 } from 'typeorm'
 
-import { Video } from '../videos/videos.model'
-import { Token } from '../auth/tokens.model'
-import { Permission } from '../videos/permissions.model'
+import { Video } from '../video/video.model'
+import { Token } from '../auth/token.model'
+import { Permission } from '../video/permission.model'
 @Entity()
 export class User extends BaseEntity {
 	@PrimaryGeneratedColumn()

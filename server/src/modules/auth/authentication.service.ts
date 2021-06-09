@@ -1,9 +1,9 @@
 import * as bcrypt from 'bcrypt'
 import * as jwt from 'jsonwebtoken'
 
-import { ICreateUserDto } from '../users/dto/create-user.dto'
-import { User } from '../users/users.model'
-import { Token } from './tokens.model'
+import { ICreateUserDto } from '../user/dto/create-user.dto'
+import { User } from '../user/user.model'
+import { Token } from './token.model'
 import { IUserPayload } from './user-payload.interface'
 
 export const authenticationService = {
@@ -24,7 +24,7 @@ export const authenticationService = {
 	},
 
 	async createRefreshToken(userId: number, token: string): Promise<Token> {
-		return await Token.create({ token, userId }).save()
+		return await Token.create({ token, user_id: userId }).save()
 	},
 
 	signAccessToken(userPayload: IUserPayload): string {
@@ -39,7 +39,7 @@ export const authenticationService = {
 	},
 
 	deleteToken(token: string, userId: number): Promise<void> {
-		Token.delete({ userId, token })
+		Token.delete({ user_id: userId, token })
 		return
 	},
 }

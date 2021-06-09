@@ -1,10 +1,10 @@
 import { Router, Request, Response } from 'express'
-import { ICreateUserDto } from '../users/dto/create-user.dto'
+import { ICreateUserDto } from '../user/dto/create-user.dto'
 import { IUserPayload } from './user-payload.interface'
 const authController = Router()
 import { authenticationService } from './authentication.service'
 import { authService } from './authorization.service'
-import { logger } from '../middleware/logger'
+import { logger } from '../../middleware/logger'
 
 /**
  * @swagger

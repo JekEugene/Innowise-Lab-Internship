@@ -1,13 +1,13 @@
 
 import { ICreateVideoDto } from './dto/create-video.dto'
 import { IUpdateVideoDto } from './dto/update-video.dto'
-import { Permission } from './permissions.model'
-import { Video } from './videos.model'
+import { Permission } from './permission.model'
+import { Video } from './video.model'
 import fs from 'fs'
-import { logger } from '../middleware/logger'
+import { logger } from '../../middleware/logger'
 class VideoService {
-	public async createVideo(newVideo: ICreateVideoDto): Promise<void> {
-		Video.create(newVideo).save()
+	public async createVideo(createVideo: ICreateVideoDto): Promise<void> {
+		Video.create({...createVideo, user_id: createVideo.userId}).save()
 	}
 
 	public async getVideo(id: number): Promise<Video> {
@@ -20,22 +20,21 @@ class VideoService {
 	
 	public async validateUpdate(userId: number, videoId: number): Promise<boolean> {
 		const video: Video = await Video.findOne(videoId)
-		return video.userId === userId ? true : false
+		return video.user_id === userId ? true : false
 	}
 
 	public async deleteVideo(id: number): Promise<void> {
-		Permission.delete({ videoId: id })
+		Permission.delete({ video_id: id })
 		Video.delete(id)
 	}
 	
 	public async validateIsUserHavePermission(userId: number, videoId: number): Promise<boolean> {
 		const video: Video = await Video.findOne(videoId, {relations: [`permissions`]})
-		
-		if (video.userId === userId) {
+		if (video.user_id === userId) {
 			return true
 		}
 		return video.permissions.some(permission => {
-			if (permission.userId === userId && permission.type === `ADMIN`) {
+			if (permission.user_id === userId && permission.type === `ADMIN`) {
 				return true
 			} else {
 				return false
@@ -45,7 +44,7 @@ class VideoService {
 
 	public async validateIsUserCanWatch(userId: number, videoId: number): Promise<boolean> {
 		const video: Video = await Video.findOne(videoId, { relations: [`permissions`] })
-		if (video.userId === userId) {
+		if (video.user_id === userId) {
 			return true
 		}
 		switch (video.type) {
@@ -55,7 +54,7 @@ class VideoService {
 			return userId ? true : false
 		case `READ_CHOSEN`:
 			return video.permissions.some(permission => {
-				if (permission.userId === userId) {
+				if (permission.user_id === userId) {
 					return true
 				} else {
 					return false
@@ -63,7 +62,7 @@ class VideoService {
 			})
 		case `READ_ADMIN`:
 			return video.permissions.some(permission => {
-				if (permission.userId === userId && permission.type === `ADMIN`) {
+				if (permission.user_id === userId && permission.type === `ADMIN`) {
 					return true
 				} else {
 					return false

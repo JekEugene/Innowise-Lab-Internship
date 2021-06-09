@@ -1,10 +1,10 @@
 import { Router, Request, Response } from 'express'
 import { authService } from '../auth/authorization.service'
-import { Video } from '../videos/videos.model'
-import { User } from './users.model'
+import { Video } from '../video/video.model'
+import { User } from './user.model'
 const userController = Router()
 
-import { userService } from './users.service'
+import { userService } from './user.service'
 
 /**
  * @swagger
@@ -57,7 +57,7 @@ userController.get(`/:id`, authService.authUser.bind(authService), async (req: R
 	}
 	const videos: Video[] = await userService.getUserVideos(res.locals.auth, userId, reqUserId)
 	const sendVideos = videos.map(video => {
-		return { id: video.id, name: video.name, link: video.link, userId: video.userId }
+		return { id: video.id, name: video.name, link: video.link, user_id: video.user_id }
 	})
 	res.status(200).json(sendVideos)
 })

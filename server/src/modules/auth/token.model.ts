@@ -6,7 +6,7 @@ import {
 	ManyToOne,
 	JoinColumn,
 } from 'typeorm'
-import { User } from '../users/users.model'
+import { User } from '../user/user.model'
 
 @Entity()
 export class Token extends BaseEntity {
@@ -14,12 +14,12 @@ export class Token extends BaseEntity {
 	id: number
 
   @Column(`int`)
-	userId: number
+	user_id: number
 
 	@Column(`varchar`)
 	token: string
 	
 	@ManyToOne(()=>User, user => user.tokens)
-	@JoinColumn({ name: `userId` })
+	@JoinColumn({ name: `user_id` })
 	user: User
 }

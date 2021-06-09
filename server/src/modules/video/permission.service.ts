@@ -1,21 +1,31 @@
+import { User } from '../user/user.model'
 import { ICreatePermissionDto } from './dto/create-permission.dto'
-import { Permission } from './permissions.model'
+import { Permission } from './permission.model'
 
 class PermissionService {
 	public async createPermission(
 		createPermission: ICreatePermissionDto
 	): Promise<void> {
-		Permission.create(createPermission).save()
+		Permission.create({
+			user_id: createPermission.userId,
+			video_id: createPermission.videoId,
+			type: createPermission.type,
+		}).save()
 	}
 
 	public async validateCreatePermission(
 		createPermission: ICreatePermissionDto
 	): Promise<boolean> {
 		const permission: Permission = await Permission.findOne(
-			{ ...createPermission },
+			{
+				user_id: createPermission.userId,
+				video_id: createPermission.videoId,
+				type: createPermission.type,
+			},
 			{ relations: [`video`] }
 		)
-		if (permission) {
+		const user: User = await User.findOne(createPermission.userId)
+		if (permission || !user) {
 			return false
 		}
 		return true
@@ -27,7 +37,7 @@ class PermissionService {
 
 	public async getVideoPermissions(videoId: number): Promise<Permission[]> {
 		const permission: Permission[] = await Permission.find({
-			where: { videoId: videoId },
+			where: { video_id: videoId },
 		})
 		return permission
 	}

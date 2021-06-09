@@ -6,8 +6,8 @@ import {
 	ManyToOne,
 	JoinColumn,
 } from 'typeorm'
-import { User } from '../users/users.model'
-import { Video } from './videos.model'
+import { User } from '../user/user.model'
+import { Video } from './video.model'
 
 @Entity()
 export class Permission extends BaseEntity {
@@ -15,19 +15,19 @@ export class Permission extends BaseEntity {
 	id: number
 
 	@Column(`int`)
-	userId: number
+	user_id: number
 
 	@Column(`int`)
-	videoId: number
+	video_id: number
 	
 	@Column(`varchar`)
 	type: string
 
 	@ManyToOne(()=>User, user => user.videos)
-	@JoinColumn({ name: `userId` })
+	@JoinColumn({ name: `user_id` })
 	user: User
 
 	@ManyToOne(()=>Video, video => video.permissions)
-	@JoinColumn({ name: `videoId` })
+	@JoinColumn({ name: `video_id` })
 	video: Video
 }

@@ -7,15 +7,15 @@ import {
 	JoinColumn,
 	OneToMany,
 } from 'typeorm'
-import { User } from '../users/users.model'
-import { Permission } from './permissions.model'
+import { User } from '../user/user.model'
+import { Permission } from './permission.model'
 @Entity()
 export class Video extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number
 
 	@Column(`int`)
-	userId: number
+	user_id: number
 
 	@Column(`varchar`)
 	name: string
@@ -27,7 +27,7 @@ export class Video extends BaseEntity {
 	link: string
 
 	@ManyToOne(()=>User, user => user.videos)
-	@JoinColumn({ name: `userId` })
+	@JoinColumn({ name: `user_id` })
 	user: User
 
 	@OneToMany(() => Permission, permission => permission.video)

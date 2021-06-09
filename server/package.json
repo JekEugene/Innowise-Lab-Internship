@@ -2,10 +2,10 @@
   "name": "innowise-lab-internship",
   "version": "1.0.0",
   "description": "",
-  "main": "./dist/app.js",
+  "main": "./src/app.ts",
   "scripts": {
-    "start": "npm run build && ts-node ./app.ts",
-    "dev": "npm run build && nodemon ./app.ts",
+    "start": "npm run build && ts-node ./src/app.ts",
+    "dev": "npm run build && nodemon ./src/app.ts",
     "build": "tsc -p .",
     "precommit": "lint-staged"
   },

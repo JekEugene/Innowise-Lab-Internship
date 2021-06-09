@@ -1,5 +1,5 @@
 import { DeepPartial } from 'typeorm'
-import { Permission } from '../permissions.model'
+import { Permission } from '../permission.model'
 
 export interface ICreatePermissionDto extends DeepPartial<Permission> {
   userId: number,

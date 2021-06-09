@@ -1,9 +1,10 @@
 import { Router, Request, Response } from 'express'
 import { authService } from '../auth/authorization.service'
-import { logger } from '../middleware/logger'
+import { logger } from '../../middleware/logger'
 const homeController = Router()
 
 import { homeService } from './home.service'
+import { Video } from '../video/video.model'
 
 /**
  * @swagger
@@ -23,13 +24,13 @@ homeController.get(
 	async (req: Request, res: Response) => {
 		try {
 			const userId: number = res.locals.user?.id
-			const videos = await homeService.getVideos(res.locals.auth, userId)
+			const videos: Video[] = await homeService.getVideos(res.locals.auth, userId)
 			const sendVideos = videos.map((video) => {
 				return {
 					id: video.id,
 					name: video.name,
 					link: video.link,
-					userId: video.userId,
+					user_id: video.user_id,
 				}
 			})
 			res.status(200).json(sendVideos)
