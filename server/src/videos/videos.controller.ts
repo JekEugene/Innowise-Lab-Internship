@@ -289,13 +289,13 @@ videoController.delete(`/deletevideo`, authService.authUser.bind(authService), a
  *       schema:
  *         type: object
  *         required:
- *         - user_id
- *         - video_id
+ *         - userId
+ *         - videoId
  *         - type
  *         properties:
- *           user_id:
+ *           userId:
  *             type: number
- *           video_id:
+ *           videoId:
  *             type: number
  *           type:
  *             type: string

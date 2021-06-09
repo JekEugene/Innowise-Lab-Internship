@@ -27,7 +27,7 @@ class PermissionService {
 
 	public async getVideoPermissions(videoId: number): Promise<Permission[]> {
 		const permission: Permission[] = await Permission.find({
-			where: { video_id: videoId },
+			where: { videoId: videoId },
 		})
 		return permission
 	}

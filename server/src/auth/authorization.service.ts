@@ -56,7 +56,7 @@ class AuthService {
 					login: user.login,
 				}
 				const userToken = await Token.find({
-					where: { user_id: userPayload.id, token },
+					where: { userId: userPayload.id, token },
 				})
 				if (!userToken) {
 					res.locals.auth = false
