@@ -7,7 +7,7 @@ import { userRepository } from './user.repository'
 
 class UserService {
 
-	public async validateId(userId: number): Promise<void> {
+	public validateId(userId: number): void {
 		if (!Number.isInteger(userId)) {
 			throw new ValidationError(`The specified user ID is invalid (e.g. not an integer)`)
 		}

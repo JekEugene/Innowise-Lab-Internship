@@ -8,7 +8,7 @@ const swaggerOptions = {
 			version: `1.0.1`,
 		},
 	},
-	apis: [`./src/modules/video/video.controller.ts`, `./src/modules/auth/authentication.controller.ts`,
+	apis: [`./src/modules/auth/authentication.controller.ts`, `./src/modules/video/video.controller.ts`,
 		`./src/modules/user/user.controller.ts`,
 	],
 }

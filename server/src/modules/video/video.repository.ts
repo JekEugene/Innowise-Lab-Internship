@@ -5,6 +5,7 @@ import { Permission } from '../permission/permission.model'
 import { Video } from './video.model'
 
 class VideoRepository {
+
 	public async createVideo(createVideo: ICreateVideoDto): Promise<void> {
 		Video.create({...createVideo, user_id: createVideo.userId}).save()
 	}

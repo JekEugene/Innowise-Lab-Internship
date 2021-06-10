@@ -73,6 +73,8 @@ videoController.get(`/`, authUser, async (req: Request, res: Response) => {
  *         description: Success
  *       400:
  *         description: Validate error
+ *       401:
+ *         description: You are not logged in
  */
 videoController.post(
 	`/newvideo`,
@@ -94,7 +96,11 @@ videoController.post(
 			videoService.createVideo(createVideo)
 			return res.status(200).send(`file uploaded`)
 		} catch (err) {
-			videoService.deleteVideoFile(link)
+			try {
+				videoService.deleteVideoFile(link)
+			} catch (err) {
+				throw `video does not exists`
+			}
 			logger.error(``, err)
 			if (err instanceof AppError) {
 				return res.status(err.statusCode).send(err.message)
@@ -121,10 +127,10 @@ videoController.post(
  *         description: Success
  *       400:
  *         description: The specified video ID is invalid (e.g. not an integer)
- *       404:
- *         description: A video with the specified ID was not found
  *       403:
  *         description: You don't have permission to watch this video
+ *       404:
+ *         description: A video with the specified ID was not found
  */
 videoController.get(`/:id`, authUser, async (req: Request, res: Response) => {
 	try {
@@ -162,6 +168,8 @@ videoController.get(`/:id`, authUser, async (req: Request, res: Response) => {
  *         description: You are not logged in
  *       403:
  *         description: You can't get permission of this video
+ *       404:
+ *         description: A video with the specified ID was not found
  */
 videoController.get(
 	`/:id/settings`,
@@ -194,21 +202,10 @@ videoController.get(
  *     tags:
  *     - videos
  *     parameters:
- *     - in: body
- *       name: video
- *       schema:
- *         type: object
- *         required:
- *         - name
- *         - link
- *         - type
- *         properties:
- *           name:
- *             type: string
- *           link:
- *             type: string
- *           type:
- *             type: string
+ *     - in: path
+ *       name: videoId
+ *       type: string
+ *       required: true
  *     responses:
  *       200:
  *         description: Success
@@ -216,6 +213,8 @@ videoController.get(
  *         description: You are not logged in
  *       403:
  *         description: You can't get permissions of this video
+ *       404:
+ *         description: A video with the specified ID was not found
  */
 videoController.get(
 	`/:id/permissions`,
@@ -226,9 +225,7 @@ videoController.get(
 			const videoId: number = +req.params.id
 			const userId: number = res.locals.user.id
 			await videoService.validateIsUserHavePermission(userId, videoId)
-			const permissions: Permission[] = await videoService.getVideoPermissions(
-				videoId
-			)
+			const permissions: Permission[] = await videoService.getVideoPermissions(videoId)
 			return res.status(200).json(permissions)
 		} catch (err) {
 			logger.error(``, err)
@@ -255,13 +252,13 @@ videoController.get(
  *       schema:
  *         type: object
  *         required:
+ *         - id
  *         - name
- *         - link
  *         - type
  *         properties:
+ *           videoId:
+ *             type: number
  *           name:
- *             type: string
- *           link:
  *             type: string
  *           type:
  *             type: string
@@ -272,6 +269,8 @@ videoController.get(
  *         description: You are not logged in
  *       403:
  *         description: You don't have permission to update this video
+ *       404:
+ *         description: A video with the specified ID was not found
  */
 videoController.patch(
 	`/updatevideo`,
@@ -279,7 +278,7 @@ videoController.patch(
 	isAuth,
 	async (req: Request, res: Response) => {
 		try {
-			const { id: videoId, name, type } = req.body
+			const { videoId, name, type } = req.body
 			const userId: number = res.locals.user.id
 			const updateVideo: IUpdateVideoDto = {
 				name,
@@ -324,6 +323,8 @@ videoController.patch(
  *         description: You are not logged in
  *       403:
  *         description: You don't have permission to update this video
+ *       404:
+ *         description: A video with the specified ID was not found
  */
 videoController.delete(
 	`/deletevideo`,
@@ -379,6 +380,8 @@ videoController.delete(
  *         description: You are not logged in
  *       403:
  *         description: You don't have permission of this video
+ *       404:
+ *         description: A video with the specified ID was not found
  *       422:
  *         description: permission already exists
  */
@@ -417,7 +420,7 @@ videoController.post(
  *     - videos
  *     parameters:
  *     - in: body
- *       name: video id
+ *       name: id
  *       schema:
  *         type: object
  *         required:
@@ -444,10 +447,10 @@ videoController.delete(
 	async (req: Request, res: Response) => {
 		try {
 			const userId: number = res.locals.user.id
-			const videoId: number = req.body.id
-			await videoService.getVideo(videoId)
+			const permissionId: number = req.body.id
+			const videoId: number = await videoService.getVideoIdByPermission(permissionId)
 			await videoService.validateIsUserHavePermission(userId, videoId)
-			videoService.deletePermission(videoId)
+			videoService.deletePermission(permissionId)
 			return res.status(200).send(`permission deleted`)
 		} catch (err) {
 			logger.error(``, err)

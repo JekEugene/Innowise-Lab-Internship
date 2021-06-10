@@ -30,6 +30,11 @@ class PermissionRepository {
 			type: createPermission.type,
 		})
 	}
+	
+	public async getPermissionById(permissionId: number): Promise<Permission> {
+		return await Permission.findOne(permissionId)
+	}
+	
 }
 
 export const permissionRepository = new PermissionRepository()

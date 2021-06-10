@@ -11,6 +11,12 @@ import { ValidationError } from '../../error/ValidationError'
 import { NotFoundError } from '../../error/NotFoundError'
 import { ForbiddenError } from '../../error/ForbiddenError'
 class VideoService {
+
+	public async getVideoIdByPermission(permissionId: number): Promise<number> {
+		const permission: Permission = await permissionRepository.getPermissionById(permissionId)
+		return permission.video_id
+	}
+
 	public async deletePermission(permissionId: number): Promise<void> {
 		permissionRepository.deletePermission(permissionId)
 	}
@@ -150,7 +156,7 @@ class VideoService {
 		else throw new ValidationError(`incorrect video type`)
 	}
 
-	public async validateId(userId: number): Promise<void> {
+	public validateId(userId: number): void {
 		if (!Number.isInteger(userId)) {
 			throw new ValidationError(
 				`The specified user ID is invalid (e.g. not an integer)`
@@ -167,7 +173,7 @@ class VideoService {
 	public async deleteVideoFile<T>(arg: T): Promise<void> {
 		if (typeof arg === `string`) {
 			const link: string = arg
-			fs.unlink(`../client/video/${link}`, (err) => {
+			fs.unlink(`../client/static/videos/${link}`, (err) => {
 				logger.error(``, err)
 			})
 			return
@@ -175,7 +181,7 @@ class VideoService {
 		if (typeof arg === `number`) {
 			const videoId: number = arg
 			const video: Video = await videoRepository.getVideo(videoId)
-			fs.unlink(`../client/video/${video.link}`, (err) => {
+			fs.unlink(`../client/static/videos/${video.link}`, (err) => {
 				logger.error(``, err)
 			})
 		}

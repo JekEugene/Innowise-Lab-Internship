@@ -10,7 +10,7 @@ import { userService } from './user.service'
 
 /**
  * @swagger
- * /users/:
+ * /users:
  *   get:
  *     summary: Get all users
  *     tags:
@@ -29,7 +29,7 @@ userController.get(`/`, async (req: Request, res: Response) => {
 
 /**
  * @swagger
- * /users/{userid}:
+ * /users/{userId}:
  *   get:
  *     summary: Get all user videos, which you can watch
  *     tags:

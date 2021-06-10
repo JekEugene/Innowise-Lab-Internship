@@ -31,7 +31,7 @@ import { isAuth } from '../../middleware/isAuth'
  *           password:
  *             type: string
  *     responses:
- *       200:
+ *       201:
  *         description: Success
  *       422:
  *         description: User already exists
@@ -81,8 +81,8 @@ authController.post(`/register`, async (req: Request, res: Response) => {
  *     responses:
  *       200:
  *         description: Success
- *       401:
- *         description: Login or password incorrect
+ *       404:
+ *         description: User not found
  */
 authController.post(`/login`, async (req: Request, res: Response) => {
 	try {
@@ -128,7 +128,6 @@ authController.post(`/login`, async (req: Request, res: Response) => {
  *     summary: logout from accout
  *     tags:
  *     - auth
- *     parameters:
  *     responses:
  *       200:
  *         description: Success
