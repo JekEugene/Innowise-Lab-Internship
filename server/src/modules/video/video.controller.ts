@@ -106,7 +106,7 @@ videoController.post(
 
 /**
  * @swagger
- * /videos/{videoId}}:
+ * /videos/{videoId}:
  *   get:
  *     summary: get video
  *     tags:
