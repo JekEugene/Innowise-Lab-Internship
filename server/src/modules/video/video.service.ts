@@ -1,13 +1,13 @@
 
 import { Video } from './video.model'
 import fs from 'fs'
-import { logger } from '../../middleware/logger'
 import { videoRepository } from './video.repository'
 import { permissionRepository } from '../permission/permission.repository'
 import { Permission } from '../permission/permission.model'
 import { ICreatePermissionDto } from './dto/create-permission.dto'
 import { ICreateVideoDto } from './dto/create-video.dto'
 import { IUpdateVideoDto } from './dto/update-video.dto'
+import { logger } from '../../config/logger'
 class VideoService {
 
 	public async deletePermission(permissionId: number): Promise<void> {

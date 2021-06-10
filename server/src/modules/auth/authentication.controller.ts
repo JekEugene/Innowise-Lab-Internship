@@ -3,15 +3,15 @@ import { ICreateUserDto } from '../user/dto/create-user.dto'
 import { IUserPayload } from './user-payload.interface'
 const authController = Router()
 import { authenticationService } from './authentication.service'
-import { logger } from '../../middleware/logger'
 import { authUser } from '../../middleware/auth'
+import { logger } from '../../config/logger'
 
 /**
  * @swagger
  * /auth/register:
  *   post:
  *     consumes:
- *      - application/json
+ *     - application/json
  *     summary: create account
  *     tags:
  *     - auth

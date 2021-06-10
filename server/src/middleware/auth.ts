@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express'
 import * as jwt from 'jsonwebtoken'
+import { logger } from '../config/logger'
 import { tokenRepository } from '../modules/auth/token.repository'
 import { IUserPayload } from '../modules/auth/user-payload.interface'
-import { logger } from './logger'
 
 export async function authUser(req: Request, res: Response, next: NextFunction): Promise<void> {
 	if (req.cookies?.accessToken) {

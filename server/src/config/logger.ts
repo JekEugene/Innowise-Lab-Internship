@@ -19,5 +19,3 @@ export const logger = createLogger({
 		filename: `error.log`,
 	}),
 })
-
-

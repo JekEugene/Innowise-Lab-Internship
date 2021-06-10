@@ -7,8 +7,10 @@ import { permissionService } from '../permission/permission.service'
 import { Video } from './video.model'
 const videoController = Router()
 import { videoService } from './video.service'
-import { logger } from '../../middleware/logger'
 import { authUser } from '../../middleware/auth'
+import multer from 'multer'
+import { fileFilter, storageConfig } from '../../config/multer'
+import { logger } from '../../config/logger'
 
 /**
  * @swagger
@@ -78,6 +80,7 @@ videoController.get(
 videoController.post(
 	`/newvideo`,
 	authUser,
+	multer({ storage: storageConfig, fileFilter: fileFilter }).single(`filedata`),
 	async (req: Request, res: Response) => {
 		const { name, link, type } = req.body
 		const userId: number = res.locals.user.id
