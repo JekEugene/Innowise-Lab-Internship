@@ -5,6 +5,7 @@ const authController = Router()
 import { authenticationService } from './authentication.service'
 import { authUser } from '../../middleware/auth'
 import { logger } from '../../config/logger'
+import { AppError } from '../../error/AppError'
 
 /**
  * @swagger
@@ -86,12 +87,12 @@ authController.post(`/login`, async (req: Request, res: Response) => {
 		const { login, password } = req.body
 		const user = await authenticationService.getUserByLogin(login)
 		if (!user) {
-			return res.status(401).send(`Login or password incorrect`)
+			return res.status(400).send(`Login or password incorrect`)
 		}
 		const arePasswordsSame: boolean =
 			await authenticationService.comparePasswords(user, password)
 		if (!arePasswordsSame) {
-			return res.status(401).send(`Login or password incorrect`)
+			return res.status(400).send(`Login or password incorrect`)
 		}
 
 		const userPayload: IUserPayload = {
@@ -118,6 +119,10 @@ authController.post(`/login`, async (req: Request, res: Response) => {
 		return res.redirect(200, `/`)
 	} catch (err) {
 		logger.error(``, err)
+		if (err instanceof AppError) {
+			return res.status(err.statusCode).send(err.message)
+		}
+		return res.status(400).send(`unknow error`)
 	}
 })
 

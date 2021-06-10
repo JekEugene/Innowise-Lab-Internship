@@ -12,6 +12,7 @@ export const storageConfig = multer.diskStorage({
 	},
 })
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const fileFilter = (req: Request, file: Express.Multer.File, cb): void => {
 	console.log(`hi`)
 	const videoTypes = [
