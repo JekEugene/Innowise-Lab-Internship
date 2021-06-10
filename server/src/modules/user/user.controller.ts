@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express'
-import { authService } from '../auth/authorization.service'
+import { authUser } from '../../middleware/auth'
 import { Video } from '../video/video.model'
 import { User } from './user.model'
 const userController = Router()
@@ -45,7 +45,7 @@ userController.get(`/`, async (req: Request, res: Response) => {
  *       404:
  *         description: A user with the specified ID was not found
  */
-userController.get(`/:id`, authService.authUser.bind(authService), async (req: Request, res: Response) => {
+userController.get(`/:id`, authUser, async (req: Request, res: Response) => {
 	const reqUserId: number = +req.params.id
 	const userId: number = res.locals.user?.id
 	if (!Number.isInteger(reqUserId)) {

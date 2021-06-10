@@ -3,8 +3,8 @@ import { ICreateUserDto } from '../user/dto/create-user.dto'
 import { IUserPayload } from './user-payload.interface'
 const authController = Router()
 import { authenticationService } from './authentication.service'
-import { authService } from './authorization.service'
 import { logger } from '../../middleware/logger'
+import { authUser } from '../../middleware/auth'
 
 /**
  * @swagger
@@ -137,7 +137,7 @@ authController.post(`/login`, async (req: Request, res: Response) => {
  */
 authController.get(
 	`/logout`,
-	authService.authUser.bind(authService),
+	authUser,
 	async (req: Request, res: Response) => {
 		try {
 			if (!res.locals.auth) {

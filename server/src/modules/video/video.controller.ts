@@ -1,5 +1,4 @@
 import { Router, Request, Response } from 'express'
-import { authService } from '../auth/authorization.service'
 import { ICreatePermissionDto } from './dto/create-permission.dto'
 import { ICreateVideoDto } from './dto/create-video.dto'
 import { IUpdateVideoDto } from './dto/update-video.dto'
@@ -9,6 +8,7 @@ import { Video } from './video.model'
 const videoController = Router()
 import { videoService } from './video.service'
 import { logger } from '../../middleware/logger'
+import { authUser } from '../../middleware/auth'
 
 /**
  * @swagger
@@ -24,7 +24,7 @@ import { logger } from '../../middleware/logger'
  */
 videoController.get(
 	`/`,
-	authService.authUser.bind(authService),
+	authUser,
 	async (req: Request, res: Response) => {
 		try {
 			const userId: number = res.locals.user?.id
@@ -77,7 +77,7 @@ videoController.get(
  */
 videoController.post(
 	`/newvideo`,
-	authService.authUser.bind(authService),
+	authUser,
 	async (req: Request, res: Response) => {
 		const { name, link, type } = req.body
 		const userId: number = res.locals.user.id
@@ -128,7 +128,7 @@ videoController.post(
  */
 videoController.get(
 	`/:id`,
-	authService.authUser.bind(authService),
+	authUser,
 	async (req: Request, res: Response) => {
 		const videoId: number = +req.params.id
 		const userId: number = res.locals.user?.id
@@ -176,7 +176,7 @@ videoController.get(
  */
 videoController.get(
 	`/:id/settings`,
-	authService.authUser.bind(authService),
+	authUser,
 	async (req: Request, res: Response) => {
 		if (!res.locals.auth) {
 			return res.status(401).send(`you are not logged in`)
@@ -231,7 +231,7 @@ videoController.get(
  */
 videoController.get(
 	`/:id/permissions`,
-	authService.authUser.bind(authService),
+	authUser,
 	async (req: Request, res: Response) => {
 		if (!res.locals.auth) {
 			return res.status(401).send(`you are not logged in`)
@@ -285,7 +285,7 @@ videoController.get(
  */
 videoController.patch(
 	`/updatevideo`,
-	authService.authUser.bind(authService),
+	authUser,
 	async (req: Request, res: Response) => {
 		if (!res.locals.auth) {
 			return res.status(401).send(`you are not logged in`)
@@ -337,7 +337,7 @@ videoController.patch(
  */
 videoController.delete(
 	`/deletevideo`,
-	authService.authUser.bind(authService),
+	authUser,
 	async (req: Request, res: Response) => {
 		if (!res.locals.auth) {
 			return res.status(401).send(`you are not logged in`)
@@ -394,7 +394,7 @@ videoController.delete(
  */
 videoController.post(
 	`/createpermission`,
-	authService.authUser.bind(authService),
+	authUser,
 	async (req: Request, res: Response) => {
 		if (!res.locals.auth) {
 			return res.status(401).send(`you are not logged in`)
@@ -454,7 +454,7 @@ videoController.post(
  */
 videoController.delete(
 	`/deletepermission`,
-	authService.authUser.bind(authService),
+	authUser,
 	async (req: Request, res: Response) => {
 		if (!res.locals.auth) {
 			return res.status(401).send(`you are not logged in`)
