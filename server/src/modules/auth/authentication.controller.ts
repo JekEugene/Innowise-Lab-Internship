@@ -5,8 +5,6 @@ const authController = Router()
 import { authenticationService } from './authentication.service'
 import { authService } from './authorization.service'
 import { logger } from '../../middleware/logger'
-import { userRepository } from '../user/user.repository'
-import { tokenRepository } from './token.repository'
 
 /**
  * @swagger
@@ -39,7 +37,7 @@ import { tokenRepository } from './token.repository'
 authController.post(`/register`, async (req: Request, res: Response) => {
 	try {
 		const { login, password } = req.body
-		const user = await userRepository.getUserByLogin(login)
+		const user = await authenticationService.getUserByLogin(login)
 		if (user) {
 			return res.status(422).send(`user already exists`)
 		}
@@ -48,7 +46,7 @@ authController.post(`/register`, async (req: Request, res: Response) => {
 			login,
 			password: hashPassword,
 		}
-		userRepository.createUser(newUser)
+		authenticationService.createUser(newUser)
 		return res.redirect(201, `/login`)
 	} catch (err) {
 		logger.error(``, err)
@@ -86,7 +84,7 @@ authController.post(`/register`, async (req: Request, res: Response) => {
 authController.post(`/login`, async (req: Request, res: Response) => {
 	try {
 		const { login, password } = req.body
-		const user = await userRepository.getUserByLogin(login)
+		const user = await authenticationService.getUserByLogin(login)
 		if (!user) {
 			return res.status(401).send(`Login or password incorrect`)
 		}
@@ -102,7 +100,7 @@ authController.post(`/login`, async (req: Request, res: Response) => {
 		}
 
 		const refreshToken = authenticationService.signRefreshToken(userPayload)
-		tokenRepository.createToken(user.id, refreshToken)
+		authenticationService.createToken(user.id, refreshToken)
 		const accessToken = authenticationService.signAccessToken(userPayload)
 
 		res.cookie(`accessToken`, accessToken, {
@@ -145,7 +143,7 @@ authController.get(
 			if (!res.locals.auth) {
 				return res.status(401).send(`you are not logged in`)
 			}
-			tokenRepository.deleteToken(
+			authenticationService.deleteToken(
 				res.locals.refreshToken,
 				res.locals.user.id
 			)

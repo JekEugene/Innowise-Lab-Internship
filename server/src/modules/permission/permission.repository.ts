@@ -5,8 +5,8 @@ class PermissionRepository {
 
 	public async createPermission(
 		createPermission: ICreatePermissionDto
-	): Promise<void> {
-		Permission.create({
+	): Promise<Permission> {
+		return await Permission.create({
 			user_id: createPermission.userId,
 			video_id: createPermission.videoId,
 			type: createPermission.type,
@@ -14,7 +14,7 @@ class PermissionRepository {
 	}
 
 	public async deletePermission(permissionId: number): Promise<void> {
-		Permission.delete(permissionId)
+		Permission.delete({ id: permissionId })
 	}
 
 	public async getVideoPermissions(videoId: number): Promise<Permission[]> {

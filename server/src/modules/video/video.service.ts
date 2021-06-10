@@ -3,7 +3,45 @@ import { Video } from './video.model'
 import fs from 'fs'
 import { logger } from '../../middleware/logger'
 import { videoRepository } from './video.repository'
+import { permissionRepository } from '../permission/permission.repository'
+import { Permission } from '../permission/permission.model'
+import { ICreatePermissionDto } from './dto/create-permission.dto'
+import { ICreateVideoDto } from './dto/create-video.dto'
+import { IUpdateVideoDto } from './dto/update-video.dto'
 class VideoService {
+
+	public async deletePermission(permissionId: number): Promise<void> {
+		permissionRepository.deletePermission(permissionId)
+	}
+
+	public async deleteVideo(videoId: number): Promise<void> {
+		videoRepository.deleteVideo(videoId)
+	}
+
+	public async updateVideo(videoId: number, updateVideo: IUpdateVideoDto): Promise<void> {
+		videoRepository.updateVideo(videoId, updateVideo)
+	}
+
+	public async getVideo(videoId: number): Promise<Video> {
+		return await videoRepository.getVideo(videoId)
+	}
+
+	public async createVideo(createVideo: ICreateVideoDto): Promise<void> {
+		videoRepository.createVideo(createVideo)
+	}
+
+	public async getAllVideos(isAuth, userId): Promise<Video[]> {
+		return await videoRepository.getAllVideos(isAuth, userId)
+	}
+
+	public async createPermission(createPermission: ICreatePermissionDto): Promise<void> {
+		permissionRepository.createPermission(createPermission)
+	}
+	
+	public async getVideoPermissions(videoId: number): Promise<Permission[]> {
+		return await permissionRepository.getVideoPermissions(videoId)
+	}
+
 	public async validateUpdate(userId: number, videoId: number): Promise<boolean> {
 		const video: Video = await videoRepository.getVideo(videoId)
 		return video.user_id === userId ? true : false

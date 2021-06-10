@@ -5,19 +5,19 @@ import { Permission } from '../permission/permission.model'
 import { Video } from './video.model'
 
 class VideoRepository {
-	public async createVideo(createVideo: ICreateVideoDto) {
-		return Video.create({...createVideo, user_id: createVideo.userId}).save()
+	public async createVideo(createVideo: ICreateVideoDto): Promise<void> {
+		Video.create({...createVideo, user_id: createVideo.userId}).save()
 	}
 
-	public async getVideo(videoId: number) {
+	public async getVideo(videoId: number): Promise<Video> {
 		return await Video.findOne(videoId)
 	}
 	
-	public async getVideoWithPermissions(videoId: number) {
+	public async getVideoWithPermissions(videoId: number): Promise<Video> {
 		return await Video.findOne(videoId, {relations: [`permissions`]})
 	}
 
-	public async getAllVideos(isAuth: boolean, userId: number) {
+	public async getAllVideos(isAuth: boolean, userId: number): Promise<Video[]> {
 		return await getRepository(Video)
 			.createQueryBuilder(`video`)
 			.leftJoin(`video.permissions`, `permission`)
@@ -42,7 +42,7 @@ class VideoRepository {
 			.getMany()
 	}
 
-	public async getAllUserVideos(isAuth: boolean, userId: number, targetId: number) {
+	public async getAllUserVideos(isAuth: boolean, userId: number, targetId: number): Promise<Video[]> {
 		return await getRepository(Video).createQueryBuilder(`video`)
 			.leftJoin(`video.permissions`, `permission`)
 			.where(`video.user_id = :targetId`, { targetId })

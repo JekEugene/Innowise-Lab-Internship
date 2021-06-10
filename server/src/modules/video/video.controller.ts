@@ -6,11 +6,8 @@ import { IUpdateVideoDto } from './dto/update-video.dto'
 import { Permission } from '../permission/permission.model'
 import { permissionService } from '../permission/permission.service'
 import { Video } from './video.model'
-import { videoRepository } from './video.repository'
 const videoController = Router()
-
 import { videoService } from './video.service'
-import { permissionRepository } from '../permission/permission.repository'
 import { logger } from '../../middleware/logger'
 
 /**
@@ -31,7 +28,7 @@ videoController.get(
 	async (req: Request, res: Response) => {
 		try {
 			const userId: number = res.locals.user?.id
-			const videos: Video[] = await videoRepository.getAllVideos(
+			const videos: Video[] = await videoService.getAllVideos(
 				res.locals.auth,
 				userId
 			)
@@ -43,7 +40,7 @@ videoController.get(
 					user_id: video.user_id,
 				}
 			})
-			res.status(200).json(sendVideos)
+			return res.status(200).json(sendVideos)
 		} catch (err) {
 			logger.error(``, err)
 		}
@@ -83,7 +80,7 @@ videoController.post(
 	authService.authUser.bind(authService),
 	async (req: Request, res: Response) => {
 		const { name, link, type } = req.body
-		const userId = res.locals.user.id
+		const userId: number = res.locals.user.id
 		const validateVideoType: boolean = await videoService.validateVideoType(
 			type
 		)
@@ -102,7 +99,7 @@ videoController.post(
 			type,
 			userId,
 		}
-		videoRepository.createVideo(newVideo)
+		videoService.createVideo(newVideo)
 		return res.status(200).send(`file uploaded`)
 	}
 )
@@ -140,7 +137,7 @@ videoController.get(
 				.status(400)
 				.send(`The specified video ID is invalid (e.g. not an integer)`)
 		}
-		const video: Video = await videoRepository.getVideo(videoId)
+		const video: Video = await videoService.getVideo(videoId)
 		if (!video) {
 			return res.status(404).send(`A video with the specified ID was not found`)
 		}
@@ -191,7 +188,10 @@ videoController.get(
 		if (!isUserHavePermission) {
 			return res.status(403).send(`you can't get permission of this video`)
 		}
-		const video: Video = await videoRepository.getVideo(videoId)
+		const video: Video = await videoService.getVideo(videoId)
+		if (!video) {
+			return res.status(404).send(`A video with the specified ID was not found`)
+		}
 		return res.status(200).json(video)
 	}
 )
@@ -243,8 +243,9 @@ videoController.get(
 		if (!isUserHavePermission) {
 			return res.status(403).send(`you can't get permission of this video`)
 		}
-		const permissions: Permission[] =
-			await permissionRepository.getVideoPermissions(videoId)
+		const permissions: Permission[] = await videoService.getVideoPermissions(
+			videoId
+		)
 		return res.status(200).json(permissions)
 	}
 )
@@ -302,7 +303,7 @@ videoController.patch(
 				.status(403)
 				.send(`you don't have permission to update this video`)
 		}
-		videoRepository.updateVideo(videoId, updateVideo)
+		videoService.updateVideo(videoId, updateVideo)
 		return res.status(200).send(`video updated`)
 	}
 )
@@ -351,7 +352,7 @@ videoController.delete(
 				.send(`you don't have permission to delete this video`)
 		}
 		videoService.deleteVideoFile(videoId)
-		videoRepository.deleteVideo(videoId)
+		videoService.deleteVideo(videoId)
 		return res.status(200).send(`video deleted`)
 	}
 )
@@ -399,25 +400,25 @@ videoController.post(
 			return res.status(401).send(`you are not logged in`)
 		}
 		const userId: number = res.locals.user.id
-		const newPermission: ICreatePermissionDto = req.body
+		const createPermission: ICreatePermissionDto = req.body
 
 		const isUserHavePermission: boolean =
 			await videoService.validateIsUserHavePermission(
 				userId,
-				newPermission.videoId
+				createPermission.videoId
 			)
 		if (!isUserHavePermission) {
 			return res.status(403).send(`you don't have permissions of this video`)
 		}
 
 		const validate: boolean = await permissionService.validateCreatePermission(
-			newPermission
+			createPermission
 		)
 		if (!validate) {
 			return res.status(422).send(`permission already exists`)
 		}
 
-		permissionRepository.createPermission(newPermission)
+		videoService.createPermission(createPermission)
 		return res.status(200).send(`permission created`)
 	}
 )
@@ -465,7 +466,7 @@ videoController.delete(
 		if (!isUserHavePermission) {
 			res.status(403).send(`you don't have permissions of this video`)
 		}
-		permissionRepository.deletePermission(videoId)
+		videoService.deletePermission(videoId)
 		return res.status(200).send(`permission deleted`)
 	}
 )
