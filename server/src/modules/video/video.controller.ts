@@ -16,7 +16,7 @@ import { logger } from '../../middleware/logger'
  *   get:
  *     summary: Get all videos, which you can watch
  *     tags:
- *     - home
+ *     - videos
  *     parameters:
  *     responses:
  *       200:

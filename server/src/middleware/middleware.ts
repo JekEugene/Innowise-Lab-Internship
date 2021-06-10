@@ -51,11 +51,12 @@ export function middleware(app: Express, express): void {
 		swaggerDefinition: {
 			info: {
 				title: `Video Gallery API`,
-				version: `1.0.0`,
+				version: `1.0.1`,
 			},
 		},
-		apis: [`./src/home/home.controller.ts`, `./src/users/users.controller.ts`,
-			`./src/videos/videos.controller.ts`, `./src/auth/authentication.controller.ts`],
+		apis: [`./src/modules/video/video.controller.ts`, `./src/modules/auth/authentication.controller.ts`,
+			`./src/modules/user/user.controller.ts`,
+		],
 	}
 	
 	const swaggerDocs = swaggerJsDoc(swaggerOptions)
