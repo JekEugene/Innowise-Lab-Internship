@@ -5,6 +5,5 @@ server/.env
 server/dist
 server/videos
 server/error.log
-server/**/dist
 client/node_modules
 client/static/videos
