@@ -1,4 +1,6 @@
 import { Router, Request, Response } from 'express'
+import { logger } from '../../config/logger'
+import { AppError } from '../../error/AppError'
 import { authUser } from '../../middleware/auth'
 import { Video } from '../video/video.model'
 import { User } from './user.model'
@@ -22,7 +24,7 @@ userController.get(`/`, async (req: Request, res: Response) => {
 	const sendUsers = users.map(user => {
 		return {id: user.id, login: user.login}
 	})
-	res.status(200).json(sendUsers)
+	return res.status(200).json(sendUsers)
 })
 
 /**
@@ -46,20 +48,24 @@ userController.get(`/`, async (req: Request, res: Response) => {
  *         description: A user with the specified ID was not found
  */
 userController.get(`/:id`, authUser, async (req: Request, res: Response) => {
-	const reqUserId: number = +req.params.id
-	const userId: number = res.locals.user?.id
-	if (!Number.isInteger(reqUserId)) {
-		return res.status(400).send(`The specified user ID is invalid (e.g. not an integer)`)
+	try {
+		const reqUserId: number = +req.params.id
+		const userId: number = res.locals.user?.id
+		userService.validateId(reqUserId)
+		await userService.isUserExist(reqUserId)
+		const videos: Video[] = await userService.getAllUserVideos(res.locals.auth, userId, reqUserId)
+		const sendVideos = videos.map(video => {
+			return { id: video.id, name: video.name, link: video.link, user_id: video.user_id }
+		})
+		return res.status(200).json(sendVideos)
+	} catch (err) {
+		logger.error(``, err)
+		if (err instanceof AppError) {
+			return res.status(err.statusCode).send(err.message)
+		}
+		return res.status(400).send(`unknown error`)
 	}
-	const isUserExist: boolean = await userService.isUserExist(reqUserId)
-	if (!isUserExist) {
-		return res.status(404).send(`A user with the specified ID was not found`)
-	}
-	const videos: Video[] = await userService.getAllUserVideos(res.locals.auth, userId, reqUserId)
-	const sendVideos = videos.map(video => {
-		return { id: video.id, name: video.name, link: video.link, user_id: video.user_id }
-	})
-	return res.status(200).json(sendVideos)
+	
 })
 
 export = userController

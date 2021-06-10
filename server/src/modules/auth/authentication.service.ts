@@ -1,5 +1,8 @@
 import * as bcrypt from 'bcrypt'
 import * as jwt from 'jsonwebtoken'
+import { EntityAlreadyExistsError } from '../../error/EntityAlreadyExistsError'
+import { NotFoundError } from '../../error/NotFoundError'
+import { ValidationError } from '../../error/ValidationError'
 import { ICreateUserDto } from '../user/dto/create-user.dto'
 
 import { User } from '../user/user.model'
@@ -13,12 +16,23 @@ class AuthenticationService {
 		tokenRepository.deleteToken(userId, token)
 	}
 
-	public async createToken(userId: number, token: string) {
+	public async createToken(userId: number, token: string): Promise<void> {
 		tokenRepository.createToken(userId, token)
 	}
+	
+	public async isUserExists(login): Promise<void> {
+		const user: User = await userRepository.getUserByLogin(login)
+		if (user) {
+			throw new EntityAlreadyExistsError(`user already exists`)
+		}
+	}
 
-	async getUserByLogin(login: string): Promise<User> {
-		return await userRepository.getUserByLogin(login)
+	public async getUserByLogin(login: string): Promise<User> {
+		const user: User = await userRepository.getUserByLogin(login)
+		if (!user) {
+			throw new NotFoundError(`user not found`)
+		}
+		return user
 	}
 
 	async createUser(createUser: ICreateUserDto): Promise<void> {
@@ -29,8 +43,11 @@ class AuthenticationService {
 		return await bcrypt.hash(password, 10)
 	}
 
-	async comparePasswords(user: User, password: string): Promise<boolean> {
-		return await bcrypt.compare(password, user.password)
+	async comparePasswords(user: User, password: string): Promise<void> {
+		const arePasswordsSame: boolean = await bcrypt.compare(password, user.password)
+		if (!arePasswordsSame) {
+			throw new ValidationError(`incorrect password`)
+		}
 	}
 
 	signAccessToken(userPayload: IUserPayload): string {

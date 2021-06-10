@@ -11,6 +11,8 @@ import { authUser } from '../../middleware/auth'
 import multer from 'multer'
 import { fileFilter, storageConfig } from '../../config/multer'
 import { logger } from '../../config/logger'
+import { isAuth } from '../../middleware/isAuth'
+import { AppError } from '../../error/AppError'
 
 /**
  * @swagger
@@ -19,35 +21,30 @@ import { logger } from '../../config/logger'
  *     summary: Get all videos, which you can watch
  *     tags:
  *     - videos
- *     parameters:
  *     responses:
  *       200:
  *         description: Success
  */
-videoController.get(
-	`/`,
-	authUser,
-	async (req: Request, res: Response) => {
-		try {
-			const userId: number = res.locals.user?.id
-			const videos: Video[] = await videoService.getAllVideos(
-				res.locals.auth,
-				userId
-			)
-			const sendVideos = videos.map((video) => {
-				return {
-					id: video.id,
-					name: video.name,
-					link: video.link,
-					user_id: video.user_id,
-				}
-			})
-			return res.status(200).json(sendVideos)
-		} catch (err) {
-			logger.error(``, err)
-		}
+videoController.get(`/`, authUser, async (req: Request, res: Response) => {
+	try {
+		const userId: number = res.locals.user?.id
+		const videos: Video[] = await videoService.getAllVideos(
+			res.locals.auth,
+			userId
+		)
+		const sendVideos = videos.map((video) => {
+			return {
+				id: video.id,
+				name: video.name,
+				link: video.link,
+				user_id: video.user_id,
+			}
+		})
+		return res.status(200).json(sendVideos)
+	} catch (err) {
+		logger.error(``, err)
 	}
-)
+})
 
 /**
  * @swagger
@@ -80,30 +77,30 @@ videoController.get(
 videoController.post(
 	`/newvideo`,
 	authUser,
+	isAuth,
 	multer({ storage: storageConfig, fileFilter: fileFilter }).single(`filedata`),
 	async (req: Request, res: Response) => {
 		const { name, link, type } = req.body
 		const userId: number = res.locals.user.id
-		const validateVideoType: boolean = await videoService.validateVideoType(
-			type
-		)
-		if (!validateVideoType) {
+		try {
+			await videoService.validateVideoType(type)
+			videoService.isFiledataExists(req.file)
+			const createVideo: ICreateVideoDto = {
+				name,
+				link,
+				type,
+				userId,
+			}
+			videoService.createVideo(createVideo)
+			return res.status(200).send(`file uploaded`)
+		} catch (err) {
 			videoService.deleteVideoFile(link)
-			return res.status(400).send(`incorrect video type`)
+			logger.error(``, err)
+			if (err instanceof AppError) {
+				return res.status(err.statusCode).send(err.message)
+			}
+			return res.status(400).send(`unknown error`)
 		}
-		const filedata = req.file
-		if (!filedata) {
-			videoService.deleteVideoFile(link)
-			return res.status(400).send(`Error uploading file`)
-		}
-		const newVideo: ICreateVideoDto = {
-			name,
-			link,
-			type,
-			userId,
-		}
-		videoService.createVideo(newVideo)
-		return res.status(200).send(`file uploaded`)
 	}
 )
 
@@ -129,33 +126,22 @@ videoController.post(
  *       403:
  *         description: You don't have permission to watch this video
  */
-videoController.get(
-	`/:id`,
-	authUser,
-	async (req: Request, res: Response) => {
+videoController.get(`/:id`, authUser, async (req: Request, res: Response) => {
+	try {
 		const videoId: number = +req.params.id
 		const userId: number = res.locals.user?.id
-		if (!Number.isInteger(videoId)) {
-			return res
-				.status(400)
-				.send(`The specified video ID is invalid (e.g. not an integer)`)
-		}
+		videoService.validateId(videoId)
 		const video: Video = await videoService.getVideo(videoId)
-		if (!video) {
-			return res.status(404).send(`A video with the specified ID was not found`)
-		}
-		const isUserCanWatch: boolean = await videoService.validateIsUserCanWatch(
-			userId,
-			videoId
-		)
-		if (!isUserCanWatch) {
-			return res
-				.status(403)
-				.send(`You don't have permission to watch this video`)
-		}
+		await videoService.validateIsUserCanWatch(userId, videoId)
 		return res.status(200).json(video)
+	} catch (err) {
+		logger.error(``, err)
+		if (err instanceof AppError) {
+			return res.status(err.statusCode).send(err.message)
+		}
+		return res.status(400).send(`unknown error`)
 	}
-)
+})
 
 /**
  * @swagger
@@ -180,22 +166,21 @@ videoController.get(
 videoController.get(
 	`/:id/settings`,
 	authUser,
+	isAuth,
 	async (req: Request, res: Response) => {
-		if (!res.locals.auth) {
-			return res.status(401).send(`you are not logged in`)
-		}
-		const videoId: number = +req.params.id
-		const userId: number = res.locals.user.id
-		const isUserHavePermission: boolean =
+		try {
+			const videoId: number = +req.params.id
+			const userId: number = res.locals.user.id
 			await videoService.validateIsUserHavePermission(userId, videoId)
-		if (!isUserHavePermission) {
-			return res.status(403).send(`you can't get permission of this video`)
+			const video: Video = await videoService.getVideo(videoId)
+			return res.status(200).json(video)
+		} catch (err) {
+			logger.error(``, err)
+			if (err instanceof AppError) {
+				return res.status(err.statusCode).send(err.message)
+			}
+			return res.status(400).send(`unknown error`)
 		}
-		const video: Video = await videoService.getVideo(videoId)
-		if (!video) {
-			return res.status(404).send(`A video with the specified ID was not found`)
-		}
-		return res.status(200).json(video)
 	}
 )
 
@@ -235,21 +220,23 @@ videoController.get(
 videoController.get(
 	`/:id/permissions`,
 	authUser,
+	isAuth,
 	async (req: Request, res: Response) => {
-		if (!res.locals.auth) {
-			return res.status(401).send(`you are not logged in`)
-		}
-		const videoId: number = +req.params.id
-		const userId: number = res.locals.user.id
-		const isUserHavePermission: boolean =
+		try {
+			const videoId: number = +req.params.id
+			const userId: number = res.locals.user.id
 			await videoService.validateIsUserHavePermission(userId, videoId)
-		if (!isUserHavePermission) {
-			return res.status(403).send(`you can't get permission of this video`)
+			const permissions: Permission[] = await videoService.getVideoPermissions(
+				videoId
+			)
+			return res.status(200).json(permissions)
+		} catch (err) {
+			logger.error(``, err)
+			if (err instanceof AppError) {
+				return res.status(err.statusCode).send(err.message)
+			}
+			return res.status(400).send(`unknown error`)
 		}
-		const permissions: Permission[] = await videoService.getVideoPermissions(
-			videoId
-		)
-		return res.status(200).json(permissions)
 	}
 )
 
@@ -289,25 +276,25 @@ videoController.get(
 videoController.patch(
 	`/updatevideo`,
 	authUser,
+	isAuth,
 	async (req: Request, res: Response) => {
-		if (!res.locals.auth) {
-			return res.status(401).send(`you are not logged in`)
-		}
-		const { id: videoId, name, type } = req.body
-		const userId: number = res.locals.user.id
-		const updateVideo: IUpdateVideoDto = {
-			name,
-			type,
-		}
-		const isUserHavePermission =
+		try {
+			const { id: videoId, name, type } = req.body
+			const userId: number = res.locals.user.id
+			const updateVideo: IUpdateVideoDto = {
+				name,
+				type,
+			}
 			await videoService.validateIsUserHavePermission(userId, videoId)
-		if (!isUserHavePermission) {
-			return res
-				.status(403)
-				.send(`you don't have permission to update this video`)
+			videoService.updateVideo(videoId, updateVideo)
+			return res.status(200).send(`video updated`)
+		} catch (err) {
+			logger.error(``, err)
+			if (err instanceof AppError) {
+				return res.status(err.statusCode).send(err.message)
+			}
+			return res.status(400).send(`unknown error`)
 		}
-		videoService.updateVideo(videoId, updateVideo)
-		return res.status(200).send(`video updated`)
 	}
 )
 
@@ -341,22 +328,22 @@ videoController.patch(
 videoController.delete(
 	`/deletevideo`,
 	authUser,
+	isAuth,
 	async (req: Request, res: Response) => {
-		if (!res.locals.auth) {
-			return res.status(401).send(`you are not logged in`)
-		}
-		const videoId: number = req.body.id
-		const userId: number = res.locals.user.id
-		const isUserHavePermission: boolean =
+		try {
+			const videoId: number = req.body.id
+			const userId: number = res.locals.user.id
 			await videoService.validateIsUserHavePermission(userId, videoId)
-		if (!isUserHavePermission) {
-			return res
-				.status(403)
-				.send(`you don't have permission to delete this video`)
+			videoService.deleteVideoFile(videoId)
+			videoService.deleteVideo(videoId)
+			return res.status(200).send(`video deleted`)
+		} catch (err) {
+			logger.error(``, err)
+			if (err instanceof AppError) {
+				return res.status(err.statusCode).send(err.message)
+			}
+			return res.status(400).send(`unknown error`)
 		}
-		videoService.deleteVideoFile(videoId)
-		videoService.deleteVideo(videoId)
-		return res.status(200).send(`video deleted`)
 	}
 )
 
@@ -398,31 +385,24 @@ videoController.delete(
 videoController.post(
 	`/createpermission`,
 	authUser,
+	isAuth,
 	async (req: Request, res: Response) => {
-		if (!res.locals.auth) {
-			return res.status(401).send(`you are not logged in`)
-		}
-		const userId: number = res.locals.user.id
-		const createPermission: ICreatePermissionDto = req.body
+		try {
+			const userId: number = res.locals.user.id
+			const createPermission: ICreatePermissionDto = req.body
 
-		const isUserHavePermission: boolean =
-			await videoService.validateIsUserHavePermission(
-				userId,
-				createPermission.videoId
-			)
-		if (!isUserHavePermission) {
-			return res.status(403).send(`you don't have permissions of this video`)
-		}
+			await videoService.validateIsUserHavePermission(userId,	createPermission.videoId)
+			await permissionService.validateCreatePermission(createPermission)
 
-		const validate: boolean = await permissionService.validateCreatePermission(
-			createPermission
-		)
-		if (!validate) {
-			return res.status(422).send(`permission already exists`)
+			videoService.createPermission(createPermission)
+			return res.status(200).send(`permission created`)
+		} catch (err) {
+			logger.error(``, err)
+			if (err instanceof AppError) {
+				return res.status(err.statusCode).send(err.message)
+			}
+			return res.status(400).send(`unknown error`)
 		}
-
-		videoService.createPermission(createPermission)
-		return res.status(200).send(`permission created`)
 	}
 )
 
@@ -452,25 +432,30 @@ videoController.post(
  *         description: You are not logged in
  *       403:
  *         description: You don't have permission of this video
+ *       404:
+ *         description: A video with the specified ID was not found
  *       422:
  *         description: permission already exists
  */
 videoController.delete(
 	`/deletepermission`,
 	authUser,
+	isAuth,
 	async (req: Request, res: Response) => {
-		if (!res.locals.auth) {
-			return res.status(401).send(`you are not logged in`)
-		}
-		const userId: number = res.locals.user.id
-		const videoId: number = req.body.id
-		const isUserHavePermission: boolean =
+		try {
+			const userId: number = res.locals.user.id
+			const videoId: number = req.body.id
+			await videoService.getVideo(videoId)
 			await videoService.validateIsUserHavePermission(userId, videoId)
-		if (!isUserHavePermission) {
-			res.status(403).send(`you don't have permissions of this video`)
+			videoService.deletePermission(videoId)
+			return res.status(200).send(`permission deleted`)
+		} catch (err) {
+			logger.error(``, err)
+			if (err instanceof AppError) {
+				return res.status(err.statusCode).send(err.message)
+			}
+			return res.status(400).send(`unknown error`)
 		}
-		videoService.deletePermission(videoId)
-		return res.status(200).send(`permission deleted`)
 	}
 )
 

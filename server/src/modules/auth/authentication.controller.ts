@@ -6,6 +6,7 @@ import { authenticationService } from './authentication.service'
 import { authUser } from '../../middleware/auth'
 import { logger } from '../../config/logger'
 import { AppError } from '../../error/AppError'
+import { isAuth } from '../../middleware/isAuth'
 
 /**
  * @swagger
@@ -38,10 +39,7 @@ import { AppError } from '../../error/AppError'
 authController.post(`/register`, async (req: Request, res: Response) => {
 	try {
 		const { login, password } = req.body
-		const user = await authenticationService.getUserByLogin(login)
-		if (user) {
-			return res.status(422).send(`user already exists`)
-		}
+		await authenticationService.isUserExists(login)
 		const hashPassword = await authenticationService.hashPassword(password)
 		const newUser: ICreateUserDto = {
 			login,
@@ -51,6 +49,10 @@ authController.post(`/register`, async (req: Request, res: Response) => {
 		return res.redirect(201, `/login`)
 	} catch (err) {
 		logger.error(``, err)
+		if (err instanceof AppError) {
+			return res.status(err.statusCode).send(err.message)
+		}
+		return res.status(400).send(`unknown error`)
 	}
 })
 
@@ -86,14 +88,7 @@ authController.post(`/login`, async (req: Request, res: Response) => {
 	try {
 		const { login, password } = req.body
 		const user = await authenticationService.getUserByLogin(login)
-		if (!user) {
-			return res.status(400).send(`Login or password incorrect`)
-		}
-		const arePasswordsSame: boolean =
-			await authenticationService.comparePasswords(user, password)
-		if (!arePasswordsSame) {
-			return res.status(400).send(`Login or password incorrect`)
-		}
+		await authenticationService.comparePasswords(user, password)
 
 		const userPayload: IUserPayload = {
 			id: user.id,
@@ -122,7 +117,7 @@ authController.post(`/login`, async (req: Request, res: Response) => {
 		if (err instanceof AppError) {
 			return res.status(err.statusCode).send(err.message)
 		}
-		return res.status(400).send(`unknow error`)
+		return res.status(400).send(`unknown error`)
 	}
 })
 
@@ -143,24 +138,22 @@ authController.post(`/login`, async (req: Request, res: Response) => {
 authController.get(
 	`/logout`,
 	authUser,
+	isAuth,
 	async (req: Request, res: Response) => {
 		try {
-			if (!res.locals.auth) {
-				return res.status(401).send(`you are not logged in`)
-			}
 			authenticationService.deleteToken(
 				res.locals.refreshToken,
 				res.locals.user.id
 			)
-			res
-				.clearCookie(`accessToken`)
-				.clearCookie(`refreshToken`)
-				.clearCookie(`id`)
-				.clearCookie(`login`)
-			return res.redirect(200, `/`)
 		} catch (err) {
 			logger.error(``, err)
 		}
+		res
+			.clearCookie(`accessToken`)
+			.clearCookie(`refreshToken`)
+			.clearCookie(`id`)
+			.clearCookie(`login`)
+		return res.redirect(200, `/`)
 	}
 )
 

@@ -1,4 +1,4 @@
-import { User } from '../user/user.model'
+import { EntityAlreadyExistsError } from '../../error/EntityAlreadyExistsError'
 import { ICreatePermissionDto } from '../video/dto/create-permission.dto'
 import { Permission } from './permission.model'
 import { permissionRepository } from './permission.repository'
@@ -7,13 +7,12 @@ class PermissionService {
 
 	public async validateCreatePermission(
 		createPermission: ICreatePermissionDto
-	): Promise<boolean> {
+	): Promise<void> {
 		const permission: Permission = await permissionRepository.getPermissionByParams(createPermission)
-		const user: User = await User.findOne(createPermission.userId)
-		if (permission || !user) {
-			return false
+		if (permission) {
+			throw new EntityAlreadyExistsError(`permission already exists`)
 		}
-		return true
+		return
 	}
 }
 
