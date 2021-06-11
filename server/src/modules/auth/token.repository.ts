@@ -1,4 +1,4 @@
-import { Token } from "./token.model"
+import { Token } from './token.model'
 
 class TokenRepository {
 	public async createToken(userId: number, token: string): Promise<Token> {
@@ -6,7 +6,7 @@ class TokenRepository {
 	}
 
 	public async getToken(userId: number, token: string): Promise<Token> {
-		return await Token.findOne({ where: { user_id: userId, token }})
+		return await Token.findOne({ where: { user_id: userId, token } })
 	}
 
 	public async deleteToken(userId: number, token: string): Promise<void> {

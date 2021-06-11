@@ -1,5 +1,5 @@
-import { ICreateUserDto } from "./dto/create-user.dto"
-import { User } from "./user.model"
+import { ICreateUserDto } from './dto/create-user.dto'
+import { User } from './user.model'
 
 class UserRepository {
 	public async createUser(user: ICreateUserDto): Promise<User> {
@@ -14,7 +14,7 @@ class UserRepository {
 		return await User.findOne(userId)
 	}
 
-	public async getAllUsers() :Promise<User[]> {
+	public async getAllUsers(): Promise<User[]> {
 		return await User.find()
 	}
 }

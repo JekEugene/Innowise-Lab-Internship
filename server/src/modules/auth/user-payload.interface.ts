@@ -1,4 +1,4 @@
 export interface IUserPayload {
-  id: number
-  login: string
+	id: number
+	login: string
 }

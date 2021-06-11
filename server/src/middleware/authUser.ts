@@ -3,7 +3,11 @@ import * as jwt from 'jsonwebtoken'
 import { logger } from '../config/logger'
 import { authorizationService } from '../modules/auth/authorization.service'
 
-export async function authUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function authUser(
+	req: Request,
+	res: Response,
+	next: NextFunction
+): Promise<void> {
 	if (req.cookies?.accessToken) {
 		const token = req.cookies.accessToken
 		let user
@@ -29,4 +33,3 @@ export async function authUser(req: Request, res: Response, next: NextFunction):
 	res.locals.auth = false
 	return next()
 }
-

@@ -1,13 +1,10 @@
 import { Router, Request, Response } from 'express'
 import { ICreatePermissionDto } from './dto/create-permission.dto'
-import { ICreateVideoDto } from './dto/create-video.dto'
-import { IUpdateVideoDto } from './dto/update-video.dto'
 import { Permission } from '../permission/permission.model'
-import { permissionService } from '../permission/permission.service'
 import { Video } from './video.model'
 const videoController = Router()
 import { videoService } from './video.service'
-import { authUser } from '../../middleware/auth'
+import { authUser } from '../../middleware/authUser'
 import multer from 'multer'
 import { fileFilter, storageConfig } from '../../config/multer'
 import { logger } from '../../config/logger'
@@ -28,10 +25,9 @@ import { AppError } from '../../error/AppError'
 videoController.get(`/`, authUser, async (req: Request, res: Response) => {
 	try {
 		const userId: number = res.locals.user?.id
-		const videos: Video[] = await videoService.getAllVideos(
-			res.locals.auth,
-			userId
-		)
+		const isAuth: boolean = res.locals.auth
+
+		const videos: Video[] = await videoService.getAllVideos(isAuth, userId)
 		const sendVideos = videos.map((video) => {
 			return {
 				id: video.id,
@@ -82,25 +78,14 @@ videoController.post(
 	isAuth,
 	multer({ storage: storageConfig, fileFilter: fileFilter }).single(`filedata`),
 	async (req: Request, res: Response) => {
-		const { name, link, type } = req.body
-		const userId: number = res.locals.user.id
 		try {
-			await videoService.validateVideoType(type)
-			videoService.isFiledataExists(req.file)
-			const createVideo: ICreateVideoDto = {
-				name,
-				link,
-				type,
-				userId,
-			}
-			videoService.createVideo(createVideo)
+			const { name, link, type } = req.body
+			const userId: number = res.locals.user.id
+			const filedata = req.file
+
+			await videoService.newVideo(name, link, type, userId, filedata)
 			return res.status(200).send(`file uploaded`)
 		} catch (err) {
-			try {
-				videoService.deleteVideoFile(link)
-			} catch (err) {
-				throw `video does not exists`
-			}
 			logger.error(``, err)
 			if (err instanceof AppError) {
 				return res.status(err.statusCode).send(err.message)
@@ -136,9 +121,8 @@ videoController.get(`/:id`, authUser, async (req: Request, res: Response) => {
 	try {
 		const videoId: number = +req.params.id
 		const userId: number = res.locals.user?.id
-		videoService.validateId(videoId)
-		const video: Video = await videoService.getVideo(videoId)
-		await videoService.validateIsUserCanWatch(userId, videoId)
+
+		const video: Video = await videoService.getVideo(videoId, userId)
 		return res.status(200).json(video)
 	} catch (err) {
 		logger.error(``, err)
@@ -179,8 +163,8 @@ videoController.get(
 		try {
 			const videoId: number = +req.params.id
 			const userId: number = res.locals.user.id
-			await videoService.validateIsUserHavePermission(userId, videoId)
-			const video: Video = await videoService.getVideo(videoId)
+
+			const video: Video = await videoService.getVideoSettings(videoId, userId)
 			return res.status(200).json(video)
 		} catch (err) {
 			logger.error(``, err)
@@ -224,8 +208,11 @@ videoController.get(
 		try {
 			const videoId: number = +req.params.id
 			const userId: number = res.locals.user.id
-			await videoService.validateIsUserHavePermission(userId, videoId)
-			const permissions: Permission[] = await videoService.getVideoPermissions(videoId)
+
+			const permissions: Permission[] = await videoService.getVideoPermissions(
+				videoId,
+				userId
+			)
 			return res.status(200).json(permissions)
 		} catch (err) {
 			logger.error(``, err)
@@ -280,12 +267,8 @@ videoController.patch(
 		try {
 			const { videoId, name, type } = req.body
 			const userId: number = res.locals.user.id
-			const updateVideo: IUpdateVideoDto = {
-				name,
-				type,
-			}
-			await videoService.validateIsUserHavePermission(userId, videoId)
-			videoService.updateVideo(videoId, updateVideo)
+
+			await videoService.updateVideo(videoId, name, type, userId)
 			return res.status(200).send(`video updated`)
 		} catch (err) {
 			logger.error(``, err)
@@ -334,9 +317,8 @@ videoController.delete(
 		try {
 			const videoId: number = req.body.id
 			const userId: number = res.locals.user.id
-			await videoService.validateIsUserHavePermission(userId, videoId)
-			videoService.deleteVideoFile(videoId)
-			videoService.deleteVideo(videoId)
+
+			await videoService.deleteVideo(videoId, userId)
 			return res.status(200).send(`video deleted`)
 		} catch (err) {
 			logger.error(``, err)
@@ -394,10 +376,7 @@ videoController.post(
 			const userId: number = res.locals.user.id
 			const createPermission: ICreatePermissionDto = req.body
 
-			await videoService.validateIsUserHavePermission(userId,	createPermission.videoId)
-			await permissionService.validateCreatePermission(createPermission)
-
-			videoService.createPermission(createPermission)
+			await videoService.createPermission(createPermission, userId)
 			return res.status(200).send(`permission created`)
 		} catch (err) {
 			logger.error(``, err)
@@ -448,9 +427,8 @@ videoController.delete(
 		try {
 			const userId: number = res.locals.user.id
 			const permissionId: number = req.body.id
-			const videoId: number = await videoService.getVideoIdByPermission(permissionId)
-			await videoService.validateIsUserHavePermission(userId, videoId)
-			videoService.deletePermission(permissionId)
+
+			await videoService.deletePermission(permissionId, userId)
 			return res.status(200).send(`permission deleted`)
 		} catch (err) {
 			logger.error(``, err)

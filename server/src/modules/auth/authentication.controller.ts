@@ -1,9 +1,7 @@
 import { Router, Request, Response } from 'express'
-import { ICreateUserDto } from '../user/dto/create-user.dto'
-import { IUserPayload } from './user-payload.interface'
 const authController = Router()
 import { authenticationService } from './authentication.service'
-import { authUser } from '../../middleware/auth'
+import { authUser } from '../../middleware/authUser'
 import { logger } from '../../config/logger'
 import { AppError } from '../../error/AppError'
 import { isAuth } from '../../middleware/isAuth'
@@ -39,13 +37,8 @@ import { isAuth } from '../../middleware/isAuth'
 authController.post(`/register`, async (req: Request, res: Response) => {
 	try {
 		const { login, password } = req.body
-		await authenticationService.isUserExists(login)
-		const hashPassword = await authenticationService.hashPassword(password)
-		const newUser: ICreateUserDto = {
-			login,
-			password: hashPassword,
-		}
-		authenticationService.createUser(newUser)
+
+		await authenticationService.register(login, password)
 		return res.redirect(201, `/login`)
 	} catch (err) {
 		logger.error(``, err)
@@ -87,30 +80,19 @@ authController.post(`/register`, async (req: Request, res: Response) => {
 authController.post(`/login`, async (req: Request, res: Response) => {
 	try {
 		const { login, password } = req.body
-		const user = await authenticationService.getUserByLogin(login)
-		await authenticationService.comparePasswords(user, password)
-
-		const userPayload: IUserPayload = {
-			id: user.id,
-			login: user.login,
-		}
-
-		const refreshToken = authenticationService.signRefreshToken(userPayload)
-		authenticationService.createToken(user.id, refreshToken)
-		const accessToken = authenticationService.signAccessToken(userPayload)
+		const { accessToken, refreshToken, userId } =
+			await authenticationService.login(login, password)
 
 		res.cookie(`accessToken`, accessToken, {
 			maxAge: 1000 * 15,
 			httpOnly: true,
-			path: `/`,
 		})
 		res.cookie(`refreshToken`, refreshToken, {
 			maxAge: 1000 * 60 * 60 * 24 * 7,
 			httpOnly: true,
-			path: `/`,
 		})
-		res.cookie(`login`, user.login, { maxAge: 1000 * 60 * 60 * 24 * 7 })
-		res.cookie(`id`, user.id, { maxAge: 1000 * 60 * 60 * 24 * 7 })
+		res.cookie(`login`, login, { maxAge: 1000 * 60 * 60 * 24 * 7 })
+		res.cookie(`id`, userId, { maxAge: 1000 * 60 * 60 * 24 * 7 })
 		return res.redirect(200, `/`)
 	} catch (err) {
 		logger.error(``, err)
@@ -140,10 +122,9 @@ authController.get(
 	isAuth,
 	async (req: Request, res: Response) => {
 		try {
-			authenticationService.deleteToken(
-				res.locals.refreshToken,
-				res.locals.user.id
-			)
+			const refreshToken: string = res.locals.refreshToken
+			const userId: number = res.locals.user.id
+			await authenticationService.logout(refreshToken, userId)
 		} catch (err) {
 			logger.error(``, err)
 		}

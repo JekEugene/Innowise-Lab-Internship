@@ -22,14 +22,14 @@ export class Video extends BaseEntity {
 
 	@Column(`varchar`)
 	type: string
-	
+
 	@Column(`varchar`)
 	link: string
 
-	@ManyToOne(()=>User, user => user.videos)
+	@ManyToOne(() => User, (user) => user.videos)
 	@JoinColumn({ name: `user_id` })
 	user: User
 
-	@OneToMany(() => Permission, permission => permission.video)
+	@OneToMany(() => Permission, (permission) => permission.video)
 	permissions: Permission[]
 }

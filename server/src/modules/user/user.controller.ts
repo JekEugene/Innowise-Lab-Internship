@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express'
 import { logger } from '../../config/logger'
 import { AppError } from '../../error/AppError'
-import { authUser } from '../../middleware/auth'
+import { authUser } from '../../middleware/authUser'
 import { Video } from '../video/video.model'
 import { User } from './user.model'
 const userController = Router()
@@ -20,11 +20,19 @@ import { userService } from './user.service'
  *         description: Success
  */
 userController.get(`/`, async (req: Request, res: Response) => {
-	const users: User[] = await userService.getAllUsers()
-	const sendUsers = users.map(user => {
-		return {id: user.id, login: user.login}
-	})
-	return res.status(200).json(sendUsers)
+	try {
+		const users: User[] = await userService.getAllUsers()
+		const sendUsers = users.map((user) => {
+			return { id: user.id, login: user.login }
+		})
+		return res.status(200).json(sendUsers)
+	} catch (err) {
+		logger.error(``, err)
+		if (err instanceof AppError) {
+			return res.status(err.statusCode).send(err.message)
+		}
+		return res.status(400).send(`unknown error`)
+	}
 })
 
 /**
@@ -51,11 +59,20 @@ userController.get(`/:id`, authUser, async (req: Request, res: Response) => {
 	try {
 		const reqUserId: number = +req.params.id
 		const userId: number = res.locals.user?.id
-		userService.validateId(reqUserId)
-		await userService.isUserExist(reqUserId)
-		const videos: Video[] = await userService.getAllUserVideos(res.locals.auth, userId, reqUserId)
-		const sendVideos = videos.map(video => {
-			return { id: video.id, name: video.name, link: video.link, user_id: video.user_id }
+		const isAuth: boolean = res.locals.auth
+
+		const videos: Video[] = await userService.getUserVideos(
+			isAuth,
+			reqUserId,
+			userId
+		)
+		const sendVideos = videos.map((video) => {
+			return {
+				id: video.id,
+				name: video.name,
+				link: video.link,
+				user_id: video.user_id,
+			}
 		})
 		return res.status(200).json(sendVideos)
 	} catch (err) {
@@ -65,7 +82,6 @@ userController.get(`/:id`, authUser, async (req: Request, res: Response) => {
 		}
 		return res.status(400).send(`unknown error`)
 	}
-	
 })
 
 export = userController

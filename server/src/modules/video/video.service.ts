@@ -10,29 +10,96 @@ import { logger } from '../../config/logger'
 import { ValidationError } from '../../error/ValidationError'
 import { NotFoundError } from '../../error/NotFoundError'
 import { ForbiddenError } from '../../error/ForbiddenError'
+import { permissionService } from '../permission/permission.service'
 class VideoService {
+	public async getAllVideos(isAuth: boolean, userId: number): Promise<Video[]> {
+		return await videoRepository.getAllVideos(isAuth, userId)
+	}
+
+	public async newVideo(
+		name: string,
+		link: string,
+		type: string,
+		userId: number,
+		filedata
+	): Promise<void> {
+		try {
+			await videoService.validateVideoType(type)
+			videoService.isFiledataExists(filedata)
+			const createVideo: ICreateVideoDto = {
+				name,
+				link,
+				type,
+				userId,
+			}
+			videoService.createVideo(createVideo)
+		} catch (err) {
+			videoService.deleteVideoFile(link)
+			throw err
+		}
+	}
+
+	public async getVideo(videoId: number, userId: number): Promise<Video> {
+		videoService.validateId(videoId)
+		await videoService.validateIsUserCanWatch(userId, videoId)
+		return await videoService.findVideo(videoId)
+	}
+
+	public async getVideoSettings(
+		videoId: number,
+		userId: number
+	): Promise<Video> {
+		await videoService.validateIsUserHavePermission(userId, videoId)
+		return await videoService.findVideo(videoId)
+	}
+
+	public async getVideoPermissions(
+		videoId: number,
+		userId: number
+	): Promise<Permission[]> {
+		await videoService.validateIsUserHavePermission(userId, videoId)
+		return await permissionRepository.getVideoPermissions(videoId)
+	}
 
 	public async getVideoIdByPermission(permissionId: number): Promise<number> {
-		const permission: Permission = await permissionRepository.getPermissionById(permissionId)
+		const permission: Permission = await permissionRepository.getPermissionById(
+			permissionId
+		)
 		return permission.video_id
 	}
 
-	public async deletePermission(permissionId: number): Promise<void> {
+	public async deletePermission(
+		permissionId: number,
+		userId: number
+	): Promise<void> {
+		const videoId: number = await videoService.getVideoIdByPermission(
+			permissionId
+		)
+		await videoService.validateIsUserHavePermission(userId, videoId)
 		permissionRepository.deletePermission(permissionId)
 	}
 
-	public async deleteVideo(videoId: number): Promise<void> {
+	public async deleteVideo(videoId: number, userId: number): Promise<void> {
+		await videoService.validateIsUserHavePermission(userId, videoId)
+		videoService.deleteVideoFile(videoId)
 		videoRepository.deleteVideo(videoId)
 	}
 
 	public async updateVideo(
 		videoId: number,
-		updateVideo: IUpdateVideoDto
+		name: string,
+		type: string,
+		userId: number
 	): Promise<void> {
+		const updateVideo: IUpdateVideoDto = {
+			name,
+			type,
+		}
+		await videoService.validateIsUserHavePermission(userId, videoId)
 		videoRepository.updateVideo(videoId, updateVideo)
 	}
 
-	public async getVideo(videoId: number): Promise<Video> {
+	public async findVideo(videoId: number): Promise<Video> {
 		const video: Video = await videoRepository.getVideo(videoId)
 		if (!video) {
 			throw new NotFoundError(`A video with the specified ID was not found`)
@@ -44,18 +111,16 @@ class VideoService {
 		videoRepository.createVideo(createVideo)
 	}
 
-	public async getAllVideos(isAuth: boolean, userId: number): Promise<Video[]> {
-		return await videoRepository.getAllVideos(isAuth, userId)
-	}
-
 	public async createPermission(
-		createPermission: ICreatePermissionDto
+		createPermission: ICreatePermissionDto,
+		userId: number
 	): Promise<void> {
+		await videoService.validateIsUserHavePermission(
+			userId,
+			createPermission.videoId
+		)
+		await permissionService.validateCreatePermission(createPermission)
 		permissionRepository.createPermission(createPermission)
-	}
-
-	public async getVideoPermissions(videoId: number): Promise<Permission[]> {
-		return await permissionRepository.getVideoPermissions(videoId)
 	}
 
 	public async validateUpdate(
@@ -77,13 +142,15 @@ class VideoService {
 		if (video.user_id === userId) {
 			return
 		}
-		const isUserHavePermission: boolean = video.permissions.some((permission) => {
-			if (permission.user_id === userId && permission.type === `ADMIN`) {
-				return true
-			} else {
-				return false
+		const isUserHavePermission: boolean = video.permissions.some(
+			(permission) => {
+				if (permission.user_id === userId && permission.type === `ADMIN`) {
+					return true
+				} else {
+					return false
+				}
 			}
-		})
+		)
 		if (!isUserHavePermission) {
 			throw new ForbiddenError(`you don't have permissions of this video`)
 		}
@@ -95,6 +162,9 @@ class VideoService {
 		videoId: number
 	): Promise<void> {
 		const video: Video = await videoRepository.getVideoWithPermissions(videoId)
+		if (!video) {
+			throw new NotFoundError(`A video with the specified ID was not found`)
+		}
 		if (video.user_id === userId) {
 			return
 		}
