@@ -23,6 +23,24 @@ npm install
 npm run start
 ```
 
+# .env
+
+### required:
+
+- ACCESS_SECRET_TOKEN
+- REFRESH_SECRET_TOKEN
+
+### optional:
+
+- PORT
+- HOST
+- DB_NAME
+- DB_PORT
+- DB_USERNAME
+- DB_PASSWORD
+- DB_LOGGING
+- DB_SYNC
+
 # Api documentation
 
 navigate to `http://localhost:{PORT}/api-docs`
