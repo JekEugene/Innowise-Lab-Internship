@@ -5,7 +5,7 @@ import { tokenRepository } from './token.repository'
 import { IUserPayload } from './user-payload.interface'
 
 class AuthorizationService {
-	async refreshToken(req: Request, res: Response): Promise<void> {
+	public async refreshToken(req: Request, res: Response): Promise<void> {
 		if (!req.cookies?.refreshToken) {
 			res.locals.auth = false
 			return

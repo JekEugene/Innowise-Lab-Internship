@@ -32,7 +32,7 @@ class VideoService {
 				type,
 				userId,
 			}
-			videoService.createVideo(createVideo)
+			videoRepository.createVideo(createVideo)
 		} catch (err) {
 			videoService.deleteVideoFile(link)
 			throw err
@@ -51,32 +51,6 @@ class VideoService {
 	): Promise<Video> {
 		await videoService.validateIsUserHavePermission(userId, videoId)
 		return await videoService.findVideo(videoId)
-	}
-
-	public async getVideoPermissions(
-		videoId: number,
-		userId: number
-	): Promise<Permission[]> {
-		await videoService.validateIsUserHavePermission(userId, videoId)
-		return await permissionRepository.getVideoPermissions(videoId)
-	}
-
-	public async getVideoIdByPermission(permissionId: number): Promise<number> {
-		const permission: Permission = await permissionRepository.getPermissionById(
-			permissionId
-		)
-		return permission.video_id
-	}
-
-	public async deletePermission(
-		permissionId: number,
-		userId: number
-	): Promise<void> {
-		const videoId: number = await videoService.getVideoIdByPermission(
-			permissionId
-		)
-		await videoService.validateIsUserHavePermission(userId, videoId)
-		permissionRepository.deletePermission(permissionId)
 	}
 
 	public async deleteVideo(videoId: number, userId: number): Promise<void> {
@@ -99,18 +73,6 @@ class VideoService {
 		videoRepository.updateVideo(videoId, updateVideo)
 	}
 
-	public async findVideo(videoId: number): Promise<Video> {
-		const video: Video = await videoRepository.getVideo(videoId)
-		if (!video) {
-			throw new NotFoundError(`A video with the specified ID was not found`)
-		}
-		return video
-	}
-
-	public async createVideo(createVideo: ICreateVideoDto): Promise<void> {
-		videoRepository.createVideo(createVideo)
-	}
-
 	public async createPermission(
 		createPermission: ICreatePermissionDto,
 		userId: number
@@ -123,7 +85,41 @@ class VideoService {
 		permissionRepository.createPermission(createPermission)
 	}
 
-	public async validateUpdate(
+	public async getVideoPermissions(
+		videoId: number,
+		userId: number
+	): Promise<Permission[]> {
+		await videoService.validateIsUserHavePermission(userId, videoId)
+		return await permissionRepository.getVideoPermissions(videoId)
+	}
+
+	public async deletePermission(
+		permissionId: number,
+		userId: number
+	): Promise<void> {
+		const videoId: number = await videoService.getVideoIdByPermission(
+			permissionId
+		)
+		await videoService.validateIsUserHavePermission(userId, videoId)
+		permissionRepository.deletePermission(permissionId)
+	}
+
+	private async getVideoIdByPermission(permissionId: number): Promise<number> {
+		const permission: Permission = await permissionRepository.getPermissionById(
+			permissionId
+		)
+		return permission.video_id
+	}
+
+	private async findVideo(videoId: number): Promise<Video> {
+		const video: Video = await videoRepository.getVideo(videoId)
+		if (!video) {
+			throw new NotFoundError(`A video with the specified ID was not found`)
+		}
+		return video
+	}
+
+	private async validateUpdate(
 		userId: number,
 		videoId: number
 	): Promise<boolean> {
@@ -131,7 +127,7 @@ class VideoService {
 		return video.user_id === userId ? true : false
 	}
 
-	public async validateIsUserHavePermission(
+	private async validateIsUserHavePermission(
 		userId: number,
 		videoId: number
 	): Promise<void> {
@@ -157,7 +153,7 @@ class VideoService {
 		return
 	}
 
-	public async validateIsUserCanWatch(
+	private async validateIsUserCanWatch(
 		userId: number,
 		videoId: number
 	): Promise<void> {
@@ -215,7 +211,7 @@ class VideoService {
 		}
 	}
 
-	public async validateVideoType(type: string): Promise<void> {
+	private async validateVideoType(type: string): Promise<void> {
 		const videoTypes: string[] = [
 			`READ_ALL`,
 			`READ_AUTH`,
@@ -226,7 +222,7 @@ class VideoService {
 		else throw new ValidationError(`incorrect video type`)
 	}
 
-	public validateId(userId: number): void {
+	private validateId(userId: number): void {
 		if (!Number.isInteger(userId)) {
 			throw new ValidationError(
 				`The specified user ID is invalid (e.g. not an integer)`
@@ -234,13 +230,13 @@ class VideoService {
 		}
 	}
 
-	public isFiledataExists(filedata) {
+	private isFiledataExists(filedata) {
 		if (!filedata) {
 			throw new ValidationError(`Error uploading file`)
 		}
 	}
 
-	public async deleteVideoFile<T>(arg: T): Promise<void> {
+	private async deleteVideoFile<T>(arg: T): Promise<void> {
 		if (typeof arg === `string`) {
 			const link: string = arg
 			fs.unlink(`../client/static/videos/${link}`, (err) => {
