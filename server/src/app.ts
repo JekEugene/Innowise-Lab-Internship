@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express'
 import dotenv from 'dotenv'
 dotenv.config()
 import { createConnection } from 'typeorm'
-import { connectionOptions } from '../ormconfig'
+import { connectionOptions } from './config/ormconfig'
 const app = express()
 import { swaggerUI, swaggerDocs } from './config/swagger'
 import cookieParser from 'cookie-parser'
