@@ -89,7 +89,7 @@
 				const form = document.querySelector('.videoupdate')
 				let fd = new FormData()
 				const updateVideo = {
-					id: form.id.value,
+					videoId: form.id.value,
 					name: form.name.value,
 					type: form.type.value
 				}
@@ -112,8 +112,8 @@
 			async function createpermission() {
 				const form = document.querySelector('.createpermission')
 				const permission = {
-					user_id: form.user_id.value,
-					video_id: form.video_id.value,
+					userId: form.user_id.value,
+					videoId: form.video_id.value,
 					type: form.type.value
 				};
 				const response = await fetch(`http://localhost:4000/videos/createpermission`, {
