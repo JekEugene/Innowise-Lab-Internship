@@ -1,9 +1,10 @@
 import express, { Request, Response } from 'express'
+const app = express()
 import dotenv from 'dotenv'
 dotenv.config()
 import { createConnection } from 'typeorm'
 import { connectionOptions } from './config/ormconfig'
-const app = express()
+
 import { swaggerUI, swaggerDocs } from './config/swagger'
 import cookieParser from 'cookie-parser'
 import { corsOptions, cors } from './config/cors'
