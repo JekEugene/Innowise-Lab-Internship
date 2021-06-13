@@ -4,11 +4,11 @@ import { Permission } from '../permission/permission.model'
 import { Video } from './video.model'
 const videoController = Router()
 import { videoService } from './video.service'
-import { authUser } from '../../middleware/authUser'
+import { authUser } from '../../middleware/auth-user'
 import multer from 'multer'
 import { fileFilter, storageConfig } from '../../config/multer'
 import { logger } from '../../config/logger'
-import { isAuth } from '../../middleware/isAuth'
+import { isAuth } from '../../middleware/is-auth'
 import { AppError } from '../../error/AppError'
 
 /**

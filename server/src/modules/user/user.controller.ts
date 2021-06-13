@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express'
 import { logger } from '../../config/logger'
 import { AppError } from '../../error/AppError'
-import { authUser } from '../../middleware/authUser'
+import { authUser } from '../../middleware/auth-user'
 import { Video } from '../video/video.model'
 import { User } from './user.model'
 const userController = Router()
