@@ -24,8 +24,8 @@ class VideoService {
 		filedata
 	): Promise<void> {
 		try {
-			await videoService.validateVideoType(type)
-			videoService.isFiledataExists(filedata)
+			await this.validateVideoType(type)
+			this.isFiledataExists(filedata)
 			const createVideo: ICreateVideoDto = {
 				name,
 				link,
@@ -34,28 +34,28 @@ class VideoService {
 			}
 			videoRepository.createVideo(createVideo)
 		} catch (err) {
-			videoService.deleteVideoFile(link)
+			this.deleteVideoFile(link)
 			throw err
 		}
 	}
 
 	public async getVideo(videoId: number, userId: number): Promise<Video> {
-		videoService.validateId(videoId)
-		await videoService.validateIsUserCanWatch(userId, videoId)
-		return await videoService.findVideo(videoId)
+		this.validateId(videoId)
+		await this.validateIsUserCanWatch(userId, videoId)
+		return await this.findVideo(videoId)
 	}
 
 	public async getVideoSettings(
 		videoId: number,
 		userId: number
 	): Promise<Video> {
-		await videoService.validateIsUserHavePermission(userId, videoId)
-		return await videoService.findVideo(videoId)
+		await this.validateIsUserHavePermission(userId, videoId)
+		return await this.findVideo(videoId)
 	}
 
 	public async deleteVideo(videoId: number, userId: number): Promise<void> {
-		await videoService.validateIsUserHavePermission(userId, videoId)
-		videoService.deleteVideoFile(videoId)
+		await this.validateIsUserHavePermission(userId, videoId)
+		this.deleteVideoFile(videoId)
 		videoRepository.deleteVideo(videoId)
 	}
 
@@ -69,7 +69,7 @@ class VideoService {
 			name,
 			type,
 		}
-		await videoService.validateIsUserHavePermission(userId, videoId)
+		await this.validateIsUserHavePermission(userId, videoId)
 		videoRepository.updateVideo(videoId, updateVideo)
 	}
 
@@ -77,7 +77,7 @@ class VideoService {
 		createPermission: ICreatePermissionDto,
 		userId: number
 	): Promise<void> {
-		await videoService.validateIsUserHavePermission(
+		await this.validateIsUserHavePermission(
 			userId,
 			createPermission.videoId
 		)
@@ -89,7 +89,7 @@ class VideoService {
 		videoId: number,
 		userId: number
 	): Promise<Permission[]> {
-		await videoService.validateIsUserHavePermission(userId, videoId)
+		await this.validateIsUserHavePermission(userId, videoId)
 		return await permissionRepository.getVideoPermissions(videoId)
 	}
 
@@ -97,10 +97,10 @@ class VideoService {
 		permissionId: number,
 		userId: number
 	): Promise<void> {
-		const videoId: number = await videoService.getVideoIdByPermission(
+		const videoId: number = await this.getVideoIdByPermission(
 			permissionId
 		)
-		await videoService.validateIsUserHavePermission(userId, videoId)
+		await this.validateIsUserHavePermission(userId, videoId)
 		permissionRepository.deletePermission(permissionId)
 	}
 
@@ -117,14 +117,6 @@ class VideoService {
 			throw new NotFoundError(`A video with the specified ID was not found`)
 		}
 		return video
-	}
-
-	private async validateUpdate(
-		userId: number,
-		videoId: number
-	): Promise<boolean> {
-		const video: Video = await videoRepository.getVideo(videoId)
-		return video.user_id === userId ? true : false
 	}
 
 	private async validateIsUserHavePermission(
@@ -230,7 +222,7 @@ class VideoService {
 		}
 	}
 
-	private isFiledataExists(filedata) {
+	private isFiledataExists(filedata): void {
 		if (!filedata) {
 			throw new ValidationError(`Error uploading file`)
 		}
