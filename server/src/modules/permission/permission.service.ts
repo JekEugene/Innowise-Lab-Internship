@@ -1,5 +1,5 @@
 import { EntityAlreadyExistsError } from '../../error/EntityAlreadyExistsError'
-import { ICreatePermissionDto } from '../video/dto/create-permission.dto'
+import { ICreatePermissionDto } from './dto/create-permission.dto'
 import { Permission } from './permission.model'
 import { permissionRepository } from './permission.repository'
 

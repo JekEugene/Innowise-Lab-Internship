@@ -1,4 +1,4 @@
-import { ICreatePermissionDto } from '../video/dto/create-permission.dto'
+import { ICreatePermissionDto } from './dto/create-permission.dto'
 import { Permission } from './permission.model'
 
 class PermissionRepository {

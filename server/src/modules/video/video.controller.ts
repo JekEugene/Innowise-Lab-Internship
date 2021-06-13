@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express'
-import { ICreatePermissionDto } from './dto/create-permission.dto'
+import { ICreatePermissionDto } from '../permission/dto/create-permission.dto'
 import { Permission } from '../permission/permission.model'
 import { Video } from './video.model'
 const videoController = Router()
