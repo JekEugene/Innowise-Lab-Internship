@@ -1,10 +1,10 @@
 import { Router, Request, Response } from 'express'
 const authController = Router()
 import { authenticationService } from './authentication.service'
-import { authUser } from '../../middleware/authUser'
+import { authUser } from '../../middleware/auth-user'
 import { logger } from '../../config/logger'
 import { AppError } from '../../error/AppError'
-import { isAuth } from '../../middleware/isAuth'
+import { isAuth } from '../../middleware/is-auth'
 
 /**
  * @swagger
