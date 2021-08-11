@@ -1,11 +1,11 @@
-# innowise-lab-internship
+# video-gallery
 
 # Getting started
 
 - Clone the repository
 
 ```
-git clone  https://github.com/JekEugene/innowise-lab-internship <project_name>
+git clone  https://github.com/JekEugene/video-gallery <project_name>
 ```
 
 - Install dependencies
